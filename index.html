@@ -1341,21 +1341,32 @@ async function importExcel(file){
     const pRows=pSheet?XLSX.utils.sheet_to_json(pSheet,{raw:true,defval:''}):[];
     const total=dRows.length+pRows.length;
     if(!total){res.textContent='읽을 데이터가 없습니다. 양식의 직영_일별 / 팝업_일별 시트를 확인하세요.';return}
-    let done=0,okD=0,okP=0,skip=0; const unmatched=new Set();
+    res.textContent='데이터 계산 중…';
+    let okD=0,okP=0,skip=0; const unmatched=new Set();
+    const patch={}, patchMem={};
+    const overlay=(k)=>{if(k in patchMem)try{return JSON.parse(patchMem[k])}catch(e){return null}return null};
+    const cur=async(k)=>overlay(k)||(await rGet(k));
+    const stage=(k,v)=>{const s=JSON.stringify(v);patchMem[k]=s;if(!String(k).startsWith('photo:'))patch[k]=s};
     for(const row of dRows){
-      done++;
       const date=xlDate(field(row,['날짜','date']));
       const nm=String(field(row,['매장','store'])||'').trim();
       const sid=findStoreIdByName(nm);
-      if(!date||!sid){skip++; if(nm&&!sid)unmatched.add(nm); continue}
+      if(!date||!sid){skip++;if(nm&&!sid)unmatched.add(nm);continue}
       let photo=num(field(row,['포토'])),capsule=num(field(row,['캡슐'])),product=num(field(row,['상품']));
       if(photo+capsule+product===0){const tot=num(field(row,['총매출','매출']));if(tot>0)product=tot}
       if(photo+capsule+product<=0){skip++;continue}
-      await saveReport(sid,{photo,capsule,product,atv:num(field(row,['객단가'])),memo:String(field(row,['코멘트'])||'').trim(),hits:String(field(row,['인기상품'])||'').trim()},date);
-      okD++; if(done%5===0)res.textContent=`처리 중… ${done}/${total}`;
+      const data={photo,capsule,product,atv:num(field(row,['객단가'])),memo:String(field(row,['코멘트'])||'').trim(),hits:String(field(row,['인기상품'])||'').trim()};
+      const prev=(await cur(repKey(date,sid)))||blankAgg();
+      const camp=(await cur(aggKey(sid)))||blankAgg();
+      const wk=(await cur(wKey(date,sid)))||blankAgg();
+      const mo=(await cur(mKey(date,sid)))||blankAgg();
+      stage(aggKey(sid),applyDelta(camp,data,prev));
+      stage(wKey(date,sid),applyDelta(wk,data,prev));
+      stage(mKey(date,sid),applyDelta(mo,data,prev));
+      stage(repKey(date,sid),{...data,ts:Date.now()});
+      okD++;
     }
     for(const row of pRows){
-      done++;
       const date=xlDate(field(row,['날짜','date']));
       const nm=String(field(row,['팝업매장','매장'])||'').trim();
       if(!date||!nm){skip++;continue}
@@ -1363,12 +1374,32 @@ async function importExcel(file){
       if(!pid){await addPopupLocation(nm);pid=popupList[popupList.length-1].id}
       const sales=num(field(row,['팝업매출','매출']));
       if(sales<=0){skip++;continue}
-      await savePopup(pid,{sales,atv:num(field(row,['객단가'])),memo:String(field(row,['코멘트'])||'').trim(),hits:String(field(row,['인기상품'])||'').trim()},date);
-      okP++; if(done%5===0)res.textContent=`처리 중… ${done}/${total}`;
+      const data={sales,atv:num(field(row,['객단가'])),memo:String(field(row,['코멘트'])||'').trim(),hits:String(field(row,['인기상품'])||'').trim()};
+      const prev=(await cur(repKey(date,pCode(pid))))||{sales:0};
+      const camp=(await cur(aggKey(pCode(pid))))||{sales:0};
+      const wk=(await cur(wKey(date,pCode(pid))))||{sales:0};
+      const mo=(await cur(mKey(date,pCode(pid))))||{sales:0};
+      const d=(data.sales||0)-(prev.sales||0);
+      stage(aggKey(pCode(pid)),{...camp,sales:(camp.sales||0)+d});
+      stage(wKey(date,pCode(pid)),{...wk,sales:(wk.sales||0)+d});
+      stage(mKey(date,pCode(pid)),{...mo,sales:(mo.sales||0)+d});
+      stage(repKey(date,pCode(pid)),{...data,ts:Date.now()});
+      okP++;
+    }
+    Object.assign(MEM,patchMem);
+    const items=Object.entries(patch).map(([key,value])=>({key,value}));
+    if(items.length>0&&apiReady()){
+      const CHUNK=100;
+      for(let i=0;i<items.length;i+=CHUNK){
+        await apiPost({action:'setMany',items:items.slice(i,i+CHUNK)});
+        res.textContent=`서버에 전송 중… ${Math.min(i+CHUNK,items.length)}/${items.length}`;
+      }
     }
     let msg=`완료 ✓ 직영 ${okD}건, 팝업 ${okP}건 등록`;
     if(skip)msg+=` · 건너뜀 ${skip}건`;
-    if(unmatched.size)msg+=`\n⚠ 매칭 안 된 직영 매장명: ${[...unmatched].join(', ')}\n→ ‘정규 매장’에 먼저 추가한 뒤 다시 업로드하세요.`;
+    if(unmatched.size)msg+=`
+⚠ 매칭 안 된 직영 매장명: ${[...unmatched].join(', ')}
+→ '정규 매장'에 먼저 추가한 뒤 다시 업로드하세요.`;
     res.innerHTML=esc(msg).replace(/\n/g,'<br>');
     renderManage();
     toast('업로드 완료 ✓');
