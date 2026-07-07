@@ -1,0 +1,2238 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root{
+    --ink:#15171C; --ink-2:#5B606B; --ink-3:#9298A4;
+    --line:#E7E8EC; --line-2:#F0F1F4;
+    --bg:#FFFFFF; --bg-2:#FAFAFB; --bg-3:#F4F5F7;
+    --brand:#1F3A5F; --pos:#1F7A4D; --pos-bg:#E8F5EE;
+    --warn:#B5781A; --neg:#B23B3B; --neg-bg:#FBEAEA;
+    --r:14px; --r-s:10px;
+    --shadow:0 1px 2px rgba(20,30,50,.05),0 8px 24px rgba(20,30,50,.06);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Apple SD Gothic Neo",Roboto,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:560px;margin:0 auto;padding:20px 16px 56px;min-height:100vh}
+  .screen{display:none;animation:fade .25s ease}
+  .screen.on{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  .brand{display:flex;align-items:center;gap:10px;margin-bottom:22px}
+  .brand-mark{width:34px;height:34px;border-radius:9px;background:var(--brand);
+    color:#fff;display:grid;place-items:center;font-weight:800;font-size:12px;letter-spacing:.4px}
+  .brand-t{font-weight:700;font-size:15px}
+  .brand-s{font-size:12px;color:var(--ink-3);margin-top:1px}
+
+  .login-card{background:var(--bg);border:1px solid var(--line);border-radius:var(--r);
+    padding:26px 22px;box-shadow:var(--shadow);margin-top:7vh}
+  .login-h{font-size:19px;font-weight:700;margin-bottom:4px}
+  .login-p{font-size:13px;color:var(--ink-2);margin-bottom:20px}
+  .code-in{width:100%;font-size:24px;font-weight:700;text-align:center;letter-spacing:8px;
+    padding:14px;border:1.5px solid var(--line);border-radius:var(--r-s);background:var(--bg-2);
+    color:var(--ink);outline:none;transition:border .15s}
+  .code-in:focus{border-color:var(--brand)}
+  .code-in::placeholder{letter-spacing:6px;color:var(--ink-3);font-weight:500}
+  .btn{width:100%;border:none;border-radius:var(--r-s);padding:14px;font-size:15px;font-weight:600;
+    cursor:pointer;transition:filter .15s,opacity .15s}
+  .btn:active{filter:brightness(.95)}
+  .btn-primary{background:var(--brand);color:#fff;margin-top:14px}
+  .btn-primary:disabled{opacity:.5;cursor:not-allowed}
+  .btn-ghost{background:var(--bg-3);color:var(--brand);border:1px solid var(--line);margin-top:10px}
+  .hint{margin-top:18px;font-size:12px;color:var(--ink-3);text-align:center;line-height:1.7}
+  .err{color:var(--neg);font-size:13px;text-align:center;margin-top:12px;min-height:18px}
+
+  .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+  .topbar .who{font-weight:700;font-size:17px}
+  .topbar .date{font-size:12px;color:var(--ink-3);margin-top:2px}
+  .out{font-size:12px;color:var(--ink-2);background:var(--bg-3);border:1px solid var(--line);
+    padding:7px 12px;border-radius:99px;cursor:pointer}
+  .out:active{background:var(--line-2)}
+
+  .metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:4px 0 16px}
+  .m{background:var(--bg-2);border:1px solid var(--line);border-radius:var(--r-s);padding:12px 8px;text-align:center}
+  .m-l{font-size:11px;color:var(--ink-3);margin-bottom:5px}
+  .m-v{font-size:16px;font-weight:700;letter-spacing:-.3px}
+  .m-v.pos{color:var(--pos)} .m-v.neg{color:var(--neg)} .m-v.warn{color:var(--warn)}
+  .m-v small{font-size:11px;font-weight:500}
+  .m-sub{font-size:10.5px;font-weight:600;margin-top:3px;color:var(--ink-3);font-variant-numeric:tabular-nums;min-height:13px}
+  .m-sub .pos{color:var(--pos)} .m-sub .neg{color:var(--neg)}
+  .subline{font-size:12px;color:var(--ink-2);background:var(--bg-2);border:1px solid var(--line);
+    border-radius:var(--r-s);padding:9px 12px;margin-bottom:16px;text-align:center;font-variant-numeric:tabular-nums}
+  .subline b{color:var(--ink);font-weight:700}
+  .subline .pos{color:var(--pos)} .subline .neg{color:var(--neg)}
+  /* date tab strip */
+  .datebar{display:flex;align-items:center;gap:6px;margin-bottom:14px}
+  .datestrip{display:flex;gap:6px;overflow-x:auto;padding:2px 0;scrollbar-width:none;flex:1}
+  .datestrip::-webkit-scrollbar{display:none}
+  .dchip{flex:0 0 auto;min-width:50px;text-align:center;padding:7px 9px;border:1px solid var(--line);
+    border-radius:var(--r-s);background:var(--bg);cursor:pointer;transition:.12s;position:relative}
+  .dchip:active{transform:scale(.97)}
+  .dchip .dd{font-size:14px;font-weight:700;line-height:1.2;color:var(--ink)}
+  .dchip .dw{font-size:10px;color:var(--ink-3);margin-top:1px}
+  .dchip.on{background:var(--brand);border-color:var(--brand)}
+  .dchip.on .dd,.dchip.on .dw{color:#fff}
+  .dchip.sat .dw{color:#3D6FB4} .dchip.sun .dw{color:#C0564E}
+  .dchip.has::after{content:"";position:absolute;top:5px;right:6px;width:5px;height:5px;border-radius:99px;background:var(--pos)}
+  .dchip.on.has::after{background:#fff}
+  .dpick{flex:0 0 auto;width:38px;height:38px;border:1px solid var(--line);border-radius:var(--r-s);
+    background:var(--bg-3);cursor:pointer;font-size:16px;position:relative;overflow:hidden}
+  .dpick input{position:absolute;inset:0;opacity:0;cursor:pointer}
+  /* popup location tabs */
+  .popup-tabs{display:flex;flex-wrap:wrap;gap:7px}
+  .ptab{padding:9px 13px;border:1px solid var(--line);border-radius:99px;background:var(--bg);
+    cursor:pointer;font-size:13px;font-weight:600;color:var(--ink-2);transition:.12s}
+  .ptab:active{transform:scale(.97)}
+  .ptab.on{background:var(--brand);border-color:var(--brand);color:#fff}
+  /* popup summary breakdown */
+  .brk{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line-2)}
+  .brk:last-child{border-bottom:none}
+  .brk-l{display:flex;align-items:center;gap:8px}
+  .brk-n{font-size:14px;font-weight:600}
+  .brk-wait{font-size:10px;font-weight:700;color:var(--ink-3);background:var(--bg-3);padding:2px 7px;border-radius:99px}
+  .brk-r{text-align:right}
+  .brk-r b{font-size:15px;font-weight:700;font-variant-numeric:tabular-nums}
+  .brk-sub{display:block;font-size:11px;color:var(--ink-3);margin-top:1px;font-variant-numeric:tabular-nums}
+  /* photos */
+  .upload-btn{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--brand);
+    background:var(--bg-3);border:1px dashed var(--brand);border-radius:var(--r-s);padding:10px 14px;cursor:pointer}
+  .upload-btn.busy{opacity:.6;pointer-events:none}
+  .upload-btn input{display:none}
+  .thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:8px;margin-top:12px}
+  .thumb{position:relative;aspect-ratio:1;border-radius:8px;overflow:hidden;border:1px solid var(--line);background:var(--bg-3)}
+  .thumb img{width:100%;height:100%;object-fit:cover;cursor:pointer;display:block}
+  .thumb-x{position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:99px;background:rgba(0,0,0,.6);
+    color:#fff;font-size:14px;line-height:19px;text-align:center;cursor:pointer}
+  .ph-empty{font-size:12px;color:var(--ink-3);padding:4px 0}
+  .ph-group{margin-bottom:14px}
+  .ph-group .ph-name{font-size:13px;font-weight:700;margin-bottom:7px}
+  #lightbox{position:fixed;inset:0;background:rgba(0,0,0,.86);display:none;align-items:center;justify-content:center;z-index:100;padding:18px}
+  #lightbox.show{display:flex}
+  #lightbox img{max-width:100%;max-height:100%;border-radius:8px}
+  /* status badges */
+  .st{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px}
+  .st-live{background:var(--pos-bg);color:var(--pos)}
+  .st-soon{background:var(--warn-bg);color:var(--warn)}
+  .st-end{background:var(--bg-3);color:var(--ink-3)}
+  .sched{font-size:12px;color:var(--ink-2);margin-top:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  /* manage rows */
+  .mrow{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--line-2);flex-wrap:wrap}
+  .mrow:last-child{border-bottom:none}
+  .mrow .mn{font-size:14px;font-weight:600;flex:1;min-width:120px}
+  .mrow .mc{font-size:12px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+  .mrow .mdel{font-size:12px;color:var(--neg);background:var(--neg-bg);border:none;padding:5px 10px;border-radius:8px;cursor:pointer}
+  .mrow input[type=date]{font-size:12px;padding:5px 7px;border:1px solid var(--line);border-radius:7px;background:var(--bg)}
+  .pin-in{font-size:13px;width:78px;text-align:center;padding:6px 8px;border:1.5px solid var(--line);border-radius:8px;background:var(--bg);font-variant-numeric:tabular-nums;letter-spacing:1px}
+  .pin-in:focus{outline:none;border-color:var(--brand)}
+  .btn-reset{font-size:11px;padding:3px 8px;border-radius:6px;border:1px solid #FFCDD2;background:#FFF5F5;color:#C62828;cursor:pointer;margin-left:auto;white-space:nowrap}
+  .btn-reset:hover{background:#FFEBEE}
+  .add-form{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)}
+  .add-form input{font-size:14px;padding:9px 10px;border:1.5px solid var(--line);border-radius:var(--r-s);background:var(--bg);flex:1;min-width:90px}
+  .add-form .btn{flex:0 0 auto;width:auto;margin-top:0;padding:9px 16px}
+  /* admin section header */
+  .sec-h{display:flex;align-items:center;justify-content:space-between;margin:18px 0 10px;padding-bottom:7px;border-bottom:2px solid var(--ink)}
+  .sec-h .sec-t{font-size:14px;font-weight:800;letter-spacing:-.2px}
+  .sec-h .sec-sub{font-size:12px;color:var(--ink-2);font-weight:600;font-variant-numeric:tabular-nums}
+
+  .card{background:var(--bg);border:1px solid var(--line);border-radius:var(--r);
+    padding:16px 15px;box-shadow:var(--shadow);margin-bottom:13px}
+  .card-h{font-size:13px;font-weight:700;color:var(--ink-2);margin-bottom:12px;
+    display:flex;align-items:center;gap:7px}
+  .card-h::before{content:"";width:3px;height:13px;background:var(--brand);border-radius:2px}
+
+  .field{margin-bottom:12px}
+  .field:last-child{margin-bottom:0}
+  .field label{display:block;font-size:13px;font-weight:600;margin-bottom:6px}
+  .field .unit{color:var(--ink-3);font-weight:400;font-size:12px}
+  .inp{width:100%;font-size:16px;padding:11px 12px;border:1.5px solid var(--line);
+    border-radius:var(--r-s);background:var(--bg);color:var(--ink);outline:none;transition:border .15s}
+  .inp:focus{border-color:var(--brand)}
+  .inp.money{text-align:right;font-variant-numeric:tabular-nums}
+  textarea.inp{resize:vertical;min-height:60px;font-family:inherit;text-align:left}
+  .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+  .row3 .field{margin-bottom:0}
+  .row3 label{font-size:12px}
+  .total-line{display:flex;justify-content:space-between;align-items:baseline;
+    margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)}
+  .total-line .t-l{font-size:13px;font-weight:600;color:var(--ink-2)}
+  .total-line .t-v{font-size:20px;font-weight:800;color:var(--brand);font-variant-numeric:tabular-nums}
+
+  /* report preview */
+  .preview{background:var(--bg-3);border:1px solid var(--line);border-radius:var(--r-s);
+    padding:14px;font-size:13px;line-height:1.7;white-space:pre-wrap;color:var(--ink);
+    font-variant-numeric:tabular-nums;max-height:280px;overflow:auto}
+
+  /* admin */
+  .sumbar{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+  .sumbar .m-v{font-size:17px}
+  .refresh{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-3);margin:2px 0 14px}
+  .dot{width:7px;height:7px;border-radius:99px;background:var(--pos);animation:blink 2s infinite}
+  @keyframes blink{50%{opacity:.3}}
+  .store{background:var(--bg);border:1px solid var(--line);border-radius:var(--r);
+    padding:14px 15px;margin-bottom:10px;box-shadow:0 1px 2px rgba(20,30,50,.04)}
+  .store-h{display:flex;align-items:center;justify-content:space-between}
+  .store-n{font-weight:700;font-size:15px}
+  .pill{font-size:11px;font-weight:700;padding:4px 9px;border-radius:99px}
+  .pill.done{background:var(--pos-bg);color:var(--pos)}
+  .pill.wait{background:var(--bg-3);color:var(--ink-3)}
+  .store-tot{display:flex;align-items:baseline;gap:8px;margin-top:8px;flex-wrap:wrap}
+  .store-tot .big{font-size:18px;font-weight:800;font-variant-numeric:tabular-nums}
+  .cats{font-size:12px;color:var(--ink-2);margin-top:7px;display:flex;gap:12px;flex-wrap:wrap}
+  .cats b{color:var(--ink);font-weight:700}
+  .memo{margin-top:9px;font-size:12px;color:var(--ink-2);background:var(--bg-2);
+    border-radius:8px;padding:8px 10px;line-height:1.55}
+  .hits{margin-top:8px;font-size:12px;color:var(--ink-2)}
+  .hits b{color:var(--ink)}
+  .kv .pos{color:var(--pos)} .kv .neg{color:var(--neg)}
+
+  .loading{text-align:center;padding:30px;color:var(--ink-3);font-size:13px}
+  .note{font-size:11px;color:var(--ink-3);text-align:center;line-height:1.7;margin-top:16px}
+
+  #toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);
+    background:var(--ink);color:#fff;font-size:13px;font-weight:500;padding:11px 18px;border-radius:99px;
+    opacity:0;pointer-events:none;transition:.25s;z-index:50;box-shadow:0 8px 24px rgba(0,0,0,.2)}
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  /* ── B2B 매출 모달 ── */
+  .b2b-fab{position:fixed;bottom:80px;right:18px;width:52px;height:52px;border-radius:50%;
+    background:var(--brand);color:#fff;font-size:22px;border:none;box-shadow:0 4px 16px rgba(0,0,0,.2);
+    cursor:pointer;display:none;align-items:center;justify-content:center;z-index:30;transition:.15s}
+  .b2b-fab:active{transform:scale(.92)}
+  .b2b-fab.show{display:flex}
+
+  .b2b-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:40;display:none;
+    align-items:flex-end;justify-content:center}
+  .b2b-overlay.show{display:flex}
+  .b2b-sheet{background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:480px;
+    padding:0 0 env(safe-area-inset-bottom,0);overflow:hidden;
+    animation:slideUp .25s ease}
+  @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+  .b2b-handle{width:36px;height:4px;background:#E0E0E0;border-radius:2px;margin:12px auto 0}
+  .b2b-head{padding:14px 18px 10px;display:flex;align-items:center;justify-content:space-between}
+  .b2b-title{font-size:16px;font-weight:800;letter-spacing:-.3px}
+  .b2b-close{font-size:22px;color:#9298A4;background:none;border:none;cursor:pointer;
+    width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:50%}
+  .b2b-body{padding:0 18px 20px}
+
+  .b2b-entry-list{max-height:280px;overflow-y:auto;margin-bottom:14px}
+  .b2b-entry-list::-webkit-scrollbar{display:none}
+  .b2b-entry-item{display:flex;align-items:center;gap:10px;padding:9px 0;
+    border-bottom:1px solid #F0F0F0}
+  .b2b-entry-item:last-child{border:none}
+  .bei-info{flex:1}
+  .bei-name{font-size:13px;font-weight:600}
+  .bei-meta{font-size:11px;color:#9298A4;margin-top:2px}
+  .bei-amt{font-size:14px;font-weight:800;color:var(--brand);font-variant-numeric:tabular-nums}
+  .bei-del{background:none;border:none;color:#E57373;font-size:16px;cursor:pointer;
+    padding:4px 6px;border-radius:6px}
+
+  .b2b-add-form{background:#F8F9FA;border-radius:12px;padding:14px}
+  .b2b-add-title{font-size:11px;font-weight:700;color:#9298A4;text-transform:uppercase;
+    letter-spacing:.06em;margin-bottom:10px}
+  .b2b-inp-row{display:flex;gap:8px;margin-bottom:8px}
+  .b2b-inp{flex:1;font-size:14px;padding:10px 11px;border:1.5px solid #E8E8E8;
+    border-radius:9px;background:#fff;outline:none;transition:.15s;font-family:inherit}
+  .b2b-inp:focus{border-color:var(--brand)}
+  .b2b-inp.money{text-align:right;font-variant-numeric:tabular-nums}
+  .b2b-add-btn{font-size:14px;font-weight:700;padding:10px 16px;background:var(--brand);
+    color:#fff;border:none;border-radius:9px;cursor:pointer;white-space:nowrap}
+  .b2b-add-btn:active{opacity:.85}
+
+  .b2b-total{display:flex;justify-content:space-between;align-items:baseline;
+    padding:12px 0 0;margin-top:4px;border-top:1.5px solid #EEEEEE}
+  .b2b-total-label{font-size:13px;font-weight:600;color:#5B606B}
+  .b2b-total-val{font-size:20px;font-weight:900;color:var(--brand);font-variant-numeric:tabular-nums}
+
+  .b2b-save-btn{width:100%;height:48px;background:var(--brand);color:#fff;border:none;
+    border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;margin-top:14px;transition:.12s}
+  .b2b-save-btn:active{opacity:.85}
+  .b2b-save-btn:disabled{background:#B0BEC5;cursor:not-allowed}
+
+  .b2b-empty{text-align:center;padding:20px 0;color:#9298A4;font-size:13px}
+</style>
+
+<div class="wrap">
+  <div id="noSaveBanner" style="display:none;background:#FFF4F4;border:1px solid #F2C0C0;color:#9B2C2C;border-radius:10px;padding:10px 12px;margin-bottom:12px;font-size:13px;line-height:1.5">
+    ⚠ <b>서버(구글시트)에 연결되지 않았습니다.</b> 코드 상단의 <b>API_URL</b>에 Apps Script 웹앱 주소가 올바르게 들어갔는지 확인하세요. 연결 전에는 입력 내용이 저장되지 않습니다.
+  </div>
+  <div class="brand">
+    <div class="brand-mark">PITB</div>
+    <div>
+      <div class="brand-t">일일 매출 보고</div>
+      <div class="brand-s">Play in the Box · 직영 매장</div>
+    </div>
+  </div>
+
+  <!-- LOGIN -->
+  <section id="s-login" class="screen on">
+    <div class="login-card">
+      <div class="login-h">매장 코드 입력</div>
+      <div class="login-p">담당 매장 코드를 입력하면 오늘 보고 화면으로 들어갑니다.</div>
+      <input id="code" class="code-in" inputmode="numeric" maxlength="8" placeholder="● ● ● ●" autocomplete="off">
+      <button id="loginBtn" class="btn btn-primary">입장하기</button>
+      <div id="loginErr" class="err"></div>
+      <div class="hint">매장 코드 또는 관리자 비밀번호를 입력하세요 · 팝업 <b id="hintPopup">8888</b> · 외부채널 <b id="hintExt">9999</b></div>
+    </div>
+  </section>
+
+  <!-- STORE -->
+  <section id="s-store" class="screen">
+    <div class="topbar">
+      <div>
+        <div class="who" id="storeName">—</div>
+        <div class="date" id="storeDate">—</div>
+      </div>
+      <div class="out" onclick="logout()">나가기</div>
+    </div>
+
+    <div class="datebar">
+      <div class="datestrip" id="storeStrip"></div>
+      <button class="dpick" title="다른 날짜 선택">📅<input type="date" id="storePick"></button>
+    </div>
+
+    <div class="metrics">
+      <div class="m"><div class="m-l">당일 총매출</div><div class="m-v" id="mToday">—</div><div class="m-sub" id="mTodayYoY"></div></div>
+      <div class="m"><div class="m-l">주간 합계</div><div class="m-v" id="mWeek">—</div><div class="m-sub" id="mWeekYoY"></div></div>
+      <div class="m"><div class="m-l">월간 합계</div><div class="m-v" id="mMonth">—</div><div class="m-sub" id="mMonthYoY"></div></div>
+    </div>
+    <div class="subline" id="storeSub">누적 —</div>
+
+    <div class="card">
+      <div class="card-h">매장 매출 (단위: 원)</div>
+      <div class="row3">
+        <div class="field"><label>포토</label><input id="inPhoto" class="inp money" inputmode="numeric" placeholder="0"></div>
+        <div class="field"><label>캡슐</label><input id="inCapsule" class="inp money" inputmode="numeric" placeholder="0"></div>
+        <div class="field"><label>상품</label><input id="inProduct" class="inp money" inputmode="numeric" placeholder="0"></div>
+      </div>
+      <div class="field" style="margin-top:12px;margin-bottom:0"><label>객단가 <span class="unit">(원)</span></label><input id="inAtv" class="inp money" inputmode="numeric" placeholder="0"></div>
+      <div class="total-line"><span class="t-l">총매출 합계</span><span class="t-v" id="storeTotal">0원</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-h">분석 & 인기상품</div>
+      <div class="field"><label>분석 코멘트 <span class="unit">(고객 반응·운영 메모)</span></label>
+        <textarea id="inMemo" class="inp" placeholder="예: 구매보다 장시간 체류 고객 비중이 높았고, 실 구매 고객 객단가는 높은 편…"></textarea></div>
+      <div class="field" style="margin-bottom:0"><label>인기상품 <span class="unit">(한 줄에 하나씩)</span></label>
+        <textarea id="inHits" class="inp" placeholder="드림즈코리아 소니엔젤 _블라워&#10;디스톤 포켓몬 이브이 피규어 랜덤 v2"></textarea></div>
+    </div>
+
+    <div class="card">
+      <div class="card-h">현장 사진 <span class="unit" style="font-weight:400;color:var(--ink-3)">매장 공유</span></div>
+      <label class="upload-btn" id="storePhotoBtn">＋ 사진 추가<input type="file" id="storePhotoInput" accept="image/*" multiple></label>
+      <div class="thumbs" id="storePhotos"></div>
+    </div>
+
+    <button id="saveBtn" class="btn btn-primary">보고 저장 · 공유</button>
+    <button id="holidayBtn" class="btn btn-ghost" style="background:#FFF8E1;border-color:#F9A825;color:#E65100">🚫 점포 휴무 (점휴)</button>
+    <button id="copyBtn" class="btn btn-ghost">📋 카카오톡 보고문 복사</button>
+    <div class="note">저장하면 관리자 화면에 실시간 반영됩니다. 같은 날 다시 저장하면 갱신됩니다.</div>
+  </section>
+
+  <!-- POPUP -->
+  <section id="s-popup" class="screen">
+    <div class="topbar">
+      <div>
+        <div class="who">팝업 매장</div>
+        <div class="date" id="popupDate">—</div>
+      </div>
+      <div class="out" onclick="logout()">나가기</div>
+    </div>
+
+    <div class="card" style="padding:14px 14px">
+      <div class="card-h">팝업 매장 선택</div>
+      <div class="popup-tabs" id="popupTabs"></div>
+      <div class="sched" id="popupSchedule"></div>
+      <button id="addPopupBtn" class="btn btn-ghost" style="margin-top:10px">➕ 팝업 매장 추가</button>
+    </div>
+
+    <div class="datebar">
+      <div class="datestrip" id="popupStrip"></div>
+      <button class="dpick" title="다른 날짜 선택">📅<input type="date" id="popupPick"></button>
+    </div>
+
+    <!-- 합계 view -->
+    <div id="popupSummary" style="display:none">
+      <div class="metrics">
+        <div class="m"><div class="m-l">당일 합계</div><div class="m-v" id="paToday">—</div></div>
+        <div class="m"><div class="m-l">주간 합계</div><div class="m-v" id="paWeek">—</div></div>
+        <div class="m"><div class="m-l">월간 합계</div><div class="m-v" id="paMonth">—</div></div>
+      </div>
+      <div class="subline" id="paSub">팝업 누적 합계 —</div>
+      <div class="card">
+        <div class="card-h">팝업별 매출 (선택일)</div>
+        <div id="paBreakdown"></div>
+      </div>
+      <button id="paCopyBtn" class="btn btn-ghost" style="margin-top:0">📋 팝업 합계 보고문 복사</button>
+    </div>
+
+    <!-- 개별 입력 view -->
+    <div id="popupEntry" style="display:none">
+      <div class="metrics">
+        <div class="m"><div class="m-l">당일 매출</div><div class="m-v" id="pToday">—</div><div class="m-sub" id="pTodayYoY"></div></div>
+        <div class="m"><div class="m-l">주간 합계</div><div class="m-v" id="pWeek">—</div><div class="m-sub" id="pWeekYoY"></div></div>
+        <div class="m"><div class="m-l">월간 합계</div><div class="m-v" id="pMonth">—</div><div class="m-sub" id="pMonthYoY"></div></div>
+      </div>
+      <div class="subline" id="popupSub">누적 —</div>
+
+      <div class="card">
+        <div class="card-h">팝업 매출 (단위: 원)</div>
+        <div class="field"><label>팝업 매출</label><input id="inPSales" class="inp money" inputmode="numeric" placeholder="0"></div>
+        <div class="field" style="margin-bottom:0;margin-top:12px"><label>객단가 <span class="unit">(원)</span></label><input id="inPAtv" class="inp money" inputmode="numeric" placeholder="0"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-h">분석 & 인기상품</div>
+        <div class="field"><label>분석 코멘트</label><textarea id="inPMemo" class="inp" placeholder="고객 반응·운영 메모"></textarea></div>
+        <div class="field" style="margin-bottom:0"><label>인기상품 <span class="unit">(한 줄에 하나씩)</span></label><textarea id="inPHits" class="inp" placeholder="디스톤 포켓몬 이브이 피규어 랜덤 v2"></textarea></div>
+      </div>
+
+      <div class="card">
+        <div class="card-h">현장 사진 <span class="unit" style="font-weight:400;color:var(--ink-3)">매장 공유</span></div>
+        <label class="upload-btn" id="popupPhotoBtn">＋ 사진 추가<input type="file" id="popupPhotoInput" accept="image/*" multiple></label>
+        <div class="thumbs" id="popupPhotos"></div>
+      </div>
+
+      <button id="pSaveBtn" class="btn btn-primary">보고 저장 · 공유</button>
+      <button id="pCopyBtn" class="btn btn-ghost">📋 카카오톡 보고문 복사</button>
+      <div class="note">저장하면 관리자 화면에 실시간 반영됩니다. 같은 날 다시 저장하면 갱신됩니다.</div>
+    </div>
+  </section>
+
+  <!-- EXTERNAL CHANNEL -->
+  <section id="s-ext" class="screen">
+    <div class="topbar">
+      <div>
+        <div class="who">외부채널 · 포토부스/캡슐토이</div>
+        <div class="date" id="extDate">—</div>
+      </div>
+      <div class="out" onclick="logout()">나가기</div>
+    </div>
+
+    <div class="card" style="padding:14px 14px">
+      <div class="card-h">외부채널 지점 선택</div>
+      <div class="popup-tabs" id="extTabs"></div>
+      <div class="sched" id="extSchedule"></div>
+      <button id="addExtBtn" class="btn btn-ghost" style="margin-top:10px">➕ 외부채널 지점 추가</button>
+    </div>
+
+    <div class="datebar">
+      <div class="datestrip" id="extStrip"></div>
+      <button class="dpick" title="다른 날짜 선택">📅<input type="date" id="extPick"></button>
+    </div>
+
+    <!-- 합계 view -->
+    <div id="extSummary" style="display:none">
+      <div class="metrics">
+        <div class="m"><div class="m-l">당일 합계</div><div class="m-v" id="xaToday">—</div></div>
+        <div class="m"><div class="m-l">주간 합계</div><div class="m-v" id="xaWeek">—</div></div>
+        <div class="m"><div class="m-l">월간 합계</div><div class="m-v" id="xaMonth">—</div></div>
+      </div>
+      <div class="subline" id="xaSub">외부채널 누적 합계 —</div>
+      <div class="card">
+        <div class="card-h">지점별 매출 (선택일)</div>
+        <div id="xaBreakdown"></div>
+      </div>
+    </div>
+
+    <!-- 개별 입력 view -->
+    <div id="extEntry" style="display:none">
+      <div class="metrics">
+        <div class="m"><div class="m-l">당일 매출</div><div class="m-v" id="xToday">—</div></div>
+        <div class="m"><div class="m-l">주간 합계</div><div class="m-v" id="xWeek">—</div></div>
+        <div class="m"><div class="m-l">월간 합계</div><div class="m-v" id="xMonth">—</div></div>
+      </div>
+      <div class="subline" id="extSub">누적 —</div>
+
+      <div class="card">
+        <div class="card-h">외부채널 매출 (단위: 원)</div>
+        <div class="field"><label>포토부스 매출</label><input id="inXPhoto" class="inp money" inputmode="numeric" placeholder="0"></div>
+        <div class="field" style="margin-bottom:0;margin-top:12px"><label>캡슐토이 매출</label><input id="inXCapsule" class="inp money" inputmode="numeric" placeholder="0"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-h">메모</div>
+        <div class="field" style="margin-bottom:0"><label>운영 메모 <span class="unit">(선택)</span></label><textarea id="inXMemo" class="inp" placeholder="기기 상태·정산 메모"></textarea></div>
+      </div>
+
+      <button id="xSaveBtn" class="btn btn-primary">보고 저장 · 공유</button>
+      <div class="note">저장하면 관리자 화면에 실시간 반영됩니다. 같은 날 다시 저장하면 갱신됩니다.</div>
+    </div>
+  </section>
+  <section id="s-admin" class="screen">
+    <div class="topbar">
+      <div>
+        <div class="who">전체 매장 현황</div>
+        <div class="date" id="adminDate">—</div>
+      </div>
+      <div class="out" onclick="logout()">나가기</div>
+    </div>
+
+    <div class="datebar">
+      <div class="datestrip" id="adminStrip"></div>
+      <button class="dpick" title="다른 날짜 선택">📅<input type="date" id="adminPick"></button>
+    </div>
+
+    <div class="sumbar">
+      <div class="m"><div class="m-l">보고 완료</div><div class="m-v" id="sumDone">—</div></div>
+      <div class="m"><div class="m-l">직영 당일</div><div class="m-v" id="sumTotal">—</div><div class="m-sub" id="sumTotalYoY"></div></div>
+      <div class="m"><div class="m-l">팝업 당일</div><div class="m-v" id="sumPopup">—</div><div class="m-sub" id="sumPopupYoY"></div></div>
+    </div>
+    <div class="sumbar" style="grid-template-columns:1fr 1fr 1fr 1fr">
+      <div class="m" style="background:#F1F5FA"><div class="m-l">직영 월간</div><div class="m-v" id="sumMonth" style="font-size:14px">—</div><div class="m-sub" id="sumMonthYoY"></div></div>
+      <div class="m" style="background:#FFF7EC"><div class="m-l">팝업 월간</div><div class="m-v" id="sumPopupMonth" style="font-size:14px">—</div><div class="m-sub"></div></div>
+      <div class="m" style="background:#EFF8F1"><div class="m-l">B2B 월간</div><div class="m-v" id="sumB2BMonth" style="font-size:14px">—</div><div class="m-sub"></div></div>
+      <div class="m" style="background:#F3EFFB"><div class="m-l">외부 월간</div><div class="m-v" id="sumExtMonth" style="font-size:14px">—</div><div class="m-sub"></div></div>
+    </div>
+    <div class="sumbar" style="grid-template-columns:1fr 1fr 1fr 1fr">
+      <div class="m" style="background:#EAF2FF"><div class="m-l">직영 연간</div><div class="m-v" id="sumYear" style="font-size:14px">—</div><div class="m-sub" id="sumYearYoY"></div></div>
+      <div class="m" style="background:#FFF3DF"><div class="m-l">팝업 연간</div><div class="m-v" id="sumPopupYear" style="font-size:14px">—</div><div class="m-sub"></div></div>
+      <div class="m" style="background:#E4F3E9"><div class="m-l">B2B 연간</div><div class="m-v" id="sumB2BYear" style="font-size:14px">—</div><div class="m-sub"></div></div>
+      <div class="m" style="background:#EDE7FA"><div class="m-l">외부 연간</div><div class="m-v" id="sumExtYear" style="font-size:14px">—</div><div class="m-sub"></div></div>
+    </div>
+
+    <button id="adminCopyBtn" class="btn btn-ghost" style="margin-top:0;margin-bottom:8px">📋 전체 요약 복사</button>
+    <div style="display:flex;gap:8px;margin-bottom:14px">
+      <button id="excelBtn" class="btn btn-ghost" style="flex:1;margin-top:0">📊 엑셀 시트 다운로드</button>
+      <button id="tsvBtn" class="btn btn-ghost" style="flex:1;margin-top:0">📋 시트 복사</button>
+    </div>
+    <button id="manageBtn" class="btn btn-ghost" style="margin-top:0;margin-bottom:14px">⚙ 매장 관리 (추가·운영일정)</button>
+
+    <div class="refresh"><span class="dot"></span> 30초마다 자동 새로고침 · <span id="lastSync">방금</span></div>
+    <div id="storeList"></div>
+    <div id="adminPhotos"></div>
+  </section>
+
+  <!-- MANAGE -->
+  <section id="s-manage" class="screen">
+    <div class="topbar">
+      <div>
+        <div class="who">매장 관리</div>
+        <div class="date">매장 추가 · 팝업 운영일정</div>
+      </div>
+      <div class="out" onclick="backToAdmin()">← 현황</div>
+    </div>
+
+    <div class="card" style="background:#EAF6EE;border-color:#BfE3CC">
+      <div class="card-h">☁ 저장 안내 (구글시트 연동)</div>
+      <div class="ph-empty">모든 매장의 입력은 <b>구글시트에 자동 저장</b>되어 관리자 화면에서 함께 보입니다. 화면을 열거나 새로고침할 때 최신 데이터를 불러옵니다. (사진은 용량이 커서 현재 버전에서는 시트에 저장되지 않고 해당 기기 세션에서만 보입니다.)</div>
+    </div>
+
+    <div class="card">
+      <div class="card-h">입장번호 관리</div>
+      <div class="mrow">
+        <span class="mn">관리자 비밀번호</span>
+        <input id="adminPwIn" class="pin-in" inputmode="numeric" maxlength="8" placeholder="숫자 4~8자리">
+        <button class="btn btn-primary" id="setAdminPwBtn" style="width:auto;margin-top:0;padding:7px 14px">변경</button>
+      </div>
+      <div class="mrow">
+        <span class="mn">팝업 매장 입장번호</span>
+        <input id="popupCodeIn" class="pin-in" inputmode="numeric" maxlength="8" placeholder="숫자 4~8자리">
+        <button class="btn btn-primary" id="setPopupCodeBtn" style="width:auto;margin-top:0;padding:7px 14px">변경</button>
+      </div>
+      <div class="ph-empty" style="margin-top:8px">관리자 비밀번호는 관리자 페이지 접속용, 팝업 입장번호는 팝업 매장 로그인용입니다. (기본: 관리자 0615 · 팝업 8888)</div>
+    </div>
+
+    <div class="card">
+      <div class="card-h">정규(직영) 매장 · 입장번호</div>
+      <div id="manageStores"></div>
+      <div class="add-form">
+        <input id="newStoreName" placeholder="매장명 (예: 더현대 대구)">
+        <input id="newStorePin" inputmode="numeric" maxlength="8" placeholder="입장번호">
+        <button class="btn btn-primary" id="addStoreBtn">추가</button>
+      </div>
+      <div class="ph-empty" style="margin-top:8px">입장번호는 매장별로 바꿀 수 있습니다(칸에 입력 후 포커스 이동 시 저장). 추가한 매장만 삭제 가능합니다.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-h">팝업 매장 · 운영일정</div>
+      <div id="managePopups"></div>
+      <div class="add-form">
+        <input id="newPopupName" placeholder="팝업 매장명" style="flex:1 1 100%">
+        <input id="newPopupStart" type="date" title="운영 시작일">
+        <input id="newPopupEnd" type="date" title="운영 종료일">
+        <button class="btn btn-primary" id="addPopupMBtn">추가</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-h">외부채널 · 운영일정 <span class="unit" style="font-weight:400;color:var(--ink-3)">포토부스/캡슐토이</span></div>
+      <div id="manageExts"></div>
+      <div class="add-form">
+        <input id="newExtName" placeholder="외부채널 지점명 (예: 메가박스 목동)" style="flex:1 1 100%">
+        <input id="newExtStart" type="date" title="운영 시작일">
+        <input id="newExtEnd" type="date" title="운영 종료일">
+        <button class="btn btn-primary" id="addExtMBtn">추가</button>
+      </div>
+      <div class="mrow" style="border-top:1px dashed var(--line);margin-top:10px;padding-top:10px">
+        <span class="mn">외부채널 입장번호</span>
+        <input id="extCodeIn" class="pin-in" inputmode="numeric" maxlength="8" placeholder="숫자 4~8자리">
+        <button class="btn btn-primary" id="setExtCodeBtn" style="width:auto;margin-top:0;padding:7px 14px">변경</button>
+      </div>
+      <div class="ph-empty" style="margin-top:8px">외부채널 담당자는 입장번호(기본: 9999)로 로그인해 포토부스·캡슐토이 매출을 입력합니다.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-h">🤝 B2B 공급 매출 (업체 거래)</div>
+      <div id="manageB2B"><div class="ph-empty">로딩 중...</div></div>
+      <div class="add-form">
+        <input id="newB2BCo" placeholder="공급 업체명" style="flex:1 1 100%">
+        <input id="newB2BDate" type="date" title="공급일" style="flex:1 1 45%">
+        <input id="newB2BAmt" inputmode="numeric" placeholder="공급 금액 (원)" style="flex:1 1 45%;text-align:right" oninput="commafy(this)">
+        <input id="newB2BMemo" placeholder="품목·메모 (선택)" style="flex:1 1 100%">
+        <button class="btn btn-primary" id="addB2BMBtn">추가</button>
+      </div>
+      <div class="ph-empty" style="margin-top:8px">업체 공급(B2B) 거래를 등록합니다. 최근 30일 거래가 표시되며, B2B 연간 합계는 상단에 자동 반영됩니다.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-h">과거 매출 일괄 업로드 (엑셀)</div>
+      <div class="ph-empty" style="margin-bottom:10px">양식을 받아 채운 뒤 업로드하면 어제까지의 매출이 한 번에 등록됩니다. 같은 날짜·매장은 덮어쓰기됩니다.</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button id="tmplBtn" class="btn btn-ghost" style="flex:1;margin-top:0">⬇ 양식 다운로드</button>
+        <label class="btn btn-primary" id="importBtn" style="flex:1;margin-top:0;text-align:center;cursor:pointer">⬆ 엑셀 업로드<input type="file" id="importInput" accept=".xlsx,.xls" style="display:none"></label>
+      </div>
+      <div id="importResult" class="ph-empty" style="margin-top:10px;white-space:pre-line"></div>
+    </div>
+  </section>
+</div>
+
+<div id="lightbox"><img id="lbImg" src="" alt=""></div>
+
+
+<div id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+const SEED_STORES = {
+  YONG:{name:'아이파크 용산',  code:'1111'},
+  HYUN:{name:'더현대 여의도',  code:'2222'},
+  SUWN:{name:'스타필드 수원',  code:'3333'},
+  SONG:{name:'현대아울렛 송도', code:'4444'},
+  COEX:{name:'메가박스 코엑스', code:'5555'},
+  CHJU:{name:'커넥트현대 청주', code:'6666'},
+  CENT:{name:'신세계 센텀시티', code:'7777'},
+};
+const SEED_ORDER=['YONG','HYUN','SUWN','SONG','COEX','CHJU','CENT'];
+const ADMIN='0000';
+let popupCode='8888';
+let extCode='9999';
+const POPUP_SEED=[
+  {id:'PU1',name:'용산_도파민'},
+  {id:'PU2',name:'부산_삼정타워'},
+  {id:'PU3',name:'부산_신세계사이먼'},
+];
+let STORES={}, ORDER=[];            // populated by loadStores()
+let storeExtra=[];                  // dynamically added regular stores
+let adminPw='0615';                 // 관리자 비밀번호 (기본 0615)
+let authCfg={adminPw:'0615',popupCode:'8888',extCode:'9999',storePins:{}}; // 통합 로그인 설정
+let current=null, refreshTimer=null;
+let selDate=ymd(new Date());        // selected report date (store)
+let selDateAdmin=ymd(new Date());   // selected date (admin)
+let selDatePopup=ymd(new Date());   // selected date (popup)
+let selPopup=null;                  // selected popup location id
+let popupList=[];                   // cached popup locations
+
+async function loadAuth(){
+  let a=await rGet('cfg:auth');
+  if(!a){ // 구버전 키 이전(있으면)
+    const adm=await rGet('cfg:adminPw'); const pop=await rGet('cfg:popupCode'); const ext=await rGet('cfg:extCode'); const sp=await rGet('stores:pins');
+    if(adm||pop||ext||sp){a={adminPw:adm||'0615',popupCode:pop||'8888',extCode:ext||'9999',storePins:sp||{}}}
+  }
+  authCfg=Object.assign({adminPw:'0615',popupCode:'8888',extCode:'9999',storePins:{}},a||{});
+  if(!authCfg.storePins||typeof authCfg.storePins!=='object')authCfg.storePins={};
+  adminPw=authCfg.adminPw; popupCode=authCfg.popupCode; extCode=authCfg.extCode||'9999';
+}
+async function saveAuth(){
+  // 쓰기 성공 여부로 판단. (쓰기 직후 재읽기는 반영 지연이 있을 수 있어 실패로 처리하지 않음)
+  return await rSet('cfg:auth',authCfg);
+}
+async function loadStores(){
+  const extra=(await rGet('stores:extra'))||[];
+  await loadAuth();
+  storeExtra=extra;
+  STORES={}; ORDER=[];
+  SEED_ORDER.forEach(id=>{STORES[id]={name:SEED_STORES[id].name,code:authCfg.storePins[id]||SEED_STORES[id].code};ORDER.push(id)});
+  extra.forEach(s=>{STORES[s.id]={name:s.name,code:s.pin};ORDER.push(s.id)});
+}
+function allPins(){const set=new Set([popupCode,adminPw,extCode]);Object.values(STORES).forEach(s=>set.add(s.code));return set}
+async function addStore(name,pin){
+  const list=(await rGet('stores:extra'))||[];
+  list.push({id:'ST'+Date.now(),name,pin});
+  const ok=await rSet('stores:extra',list); await loadStores(); return ok;
+}
+async function removeStore(id){
+  let list=(await rGet('stores:extra'))||[];
+  list=list.filter(s=>s.id!==id);
+  await rSet('stores:extra',list); await loadStores();
+}
+async function setStorePin(id,pin){
+  let ok=true;
+  if(SEED_ORDER.includes(id)){authCfg.storePins[id]=pin; ok=await saveAuth()}
+  else{const list=(await rGet('stores:extra'))||[];const s=list.find(x=>x.id===id);if(s)s.pin=pin;ok=await rSet('stores:extra',list)}
+  await loadStores(); return ok;
+}
+async function setAdminPw(pw){authCfg.adminPw=pw; const ok=await saveAuth(); adminPw=pw; return ok}
+async function setPopupCode(code){authCfg.popupCode=code; const ok=await saveAuth(); popupCode=code; return ok}
+
+/* date — all helpers operate on a 'YYYY-MM-DD' string (default: today) */
+function pad(n){return String(n).padStart(2,'0')}
+function ymd(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())}
+function parseD(s){const[y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)}
+function today(){return ymd(new Date())}
+function addDays(s,n){const d=parseD(s);d.setDate(d.getDate()+n);return ymd(d)}
+function prevDay(s){return addDays(s,-1)}
+const DOW=['일','월','화','수','목','금','토'];
+function dateLabel(s){const d=parseD(s);return `${d.getMonth()+1}월 ${d.getDate()}일 (${DOW[d.getDay()]})`}
+function shortDate(s){const d=parseD(s);return `${d.getMonth()+1}/${d.getDate()}일`}
+function weekId(s){const d=parseD(s);const day=(d.getDay()+6)%7;d.setDate(d.getDate()-day);return ymd(d)} // Monday
+function monthId(s){const d=parseD(s);return d.getFullYear()+'-'+pad(d.getMonth()+1)}
+function weekRangeLabel(s){const a=parseD(weekId(s));const b=new Date(a);b.setDate(b.getDate()+6);return `${a.getMonth()+1}/${a.getDate()}~${b.getMonth()+1}/${b.getDate()}`}
+function monthLabel(s){return parseD(s).getMonth()+1+'월'}
+/* 전년 동요일(=364일 전, 같은 요일) / 전년 동월 */
+function lastYearSameDOW(s){return addDays(s,-364)}
+function lastYearMonthId(s){const d=parseD(s);return (d.getFullYear()-1)+'-'+pad(d.getMonth()+1)}
+function yoyHtml(cur,prev,label){
+  label=label||'전년';
+  if(!prev||prev<=0)return `${label} —`;
+  const dd=Math.round((cur-prev)/prev*100);
+  return `${label} <span class="${dd>=0?'pos':'neg'}">${dd>=0?'+':''}${dd}%</span>`;
+}
+function yoyHtmlIf(cur,prev){
+  if(!prev||prev<=0)return '';
+  const dd=Math.round((cur-prev)/prev*100);
+  return `전년 <span class="${dd>=0?'pos':'neg'}">${dd>=0?'+':''}${dd}%</span>`;
+}
+
+/* money */
+function won(n){return (n||0).toLocaleString('ko-KR')+'원'}
+function num(str){const v=parseInt(String(str).replace(/[^\d]/g,''),10);return isNaN(v)?0:v}
+function commafy(el){const v=num(el.value);el.value=v?v.toLocaleString('ko-KR'):''}
+
+/* ===== 저장소: 구글 시트(Apps Script 웹앱) 연동 ===== */
+/* ↓↓↓ 여기에 본인 Apps Script 웹앱 URL을 붙여넣으세요 (https://script.google.com/macros/s/..../exec) ↓↓↓ */
+const API_URL = "https://script.google.com/macros/s/AKfycbwbJJUN8EU89djpkcEwpdiUcqqQpCAWgH93RxhaNBBDI8jnW88fObZfqoOLzGhe4SWbPQ/exec";
+/* ↑↑↑ 위 한 줄만 바꾸면 됩니다 ↑↑↑ */
+
+let MEM={};            // 전체 키-값 캐시(서버에서 한 번에 받아옴)
+let MEM_LOADED=false;
+let BACKEND_OK=false;
+function apiReady(){return API_URL && API_URL.indexOf('PASTE_')!==0 && /^https:\/\/script\.google\.com\//.test(API_URL)}
+
+async function loadAll(){       // 서버의 모든 데이터를 한 번에 가져와 캐시
+  if(!apiReady()){BACKEND_OK=false;MEM_LOADED=true;return false}
+  try{
+    const res=await fetch(API_URL+'?action=all&t='+Date.now(),{method:'GET'});
+    const data=await res.json();
+    MEM=(data&&data.kv)?data.kv:{};
+    MEM_LOADED=true; BACKEND_OK=true; return true;
+  }catch(e){console.error('loadAll 실패',e);BACKEND_OK=false;MEM_LOADED=true;return false}
+}
+async function apiPost(payload){
+  if(!apiReady())return false;
+  try{
+    await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});
+    return true;
+  }catch(e){console.error('apiPost 실패',e);return false}
+}
+async function rGet(k){ if(!MEM_LOADED)await loadAll(); const v=MEM[k]; try{return v?JSON.parse(v):null}catch(e){return null} }
+async function rSet(k,v){
+  const s=JSON.stringify(v); MEM[k]=s;
+  // 사진(photo:)은 용량이 커서 시트에 저장하지 않고 현재 세션에서만 유지
+  if(String(k).indexOf('photo:')===0)return true;
+  return await apiPost({action:'set',key:k,value:s});
+}
+async function rDel(k){
+  delete MEM[k];
+  if(String(k).indexOf('photo:')===0)return true;
+  return await apiPost({action:'delete',key:k});
+}
+async function rList(prefix){ if(!MEM_LOADED)await loadAll(); return {keys:Object.keys(MEM).filter(x=>x.indexOf(prefix)===0)} }
+
+/* ===== PHOTOS (shared) ===== */
+const photoPrefix=(date,owner)=>`photo:${date}:${owner}:`;
+const photoKey=(date,owner,id)=>`photo:${date}:${owner}:${id}`;
+function resizeImage(file,maxDim=1280,quality=0.7){
+  return new Promise((resolve,reject)=>{
+    const url=URL.createObjectURL(file);
+    const img=new Image();
+    img.onload=()=>{
+      URL.revokeObjectURL(url);
+      let w=img.width,h=img.height;
+      if(w>h&&w>maxDim){h=Math.round(h*maxDim/w);w=maxDim}
+      else if(h>=w&&h>maxDim){w=Math.round(w*maxDim/h);h=maxDim}
+      const c=document.createElement('canvas');c.width=w;c.height=h;
+      c.getContext('2d').drawImage(img,0,0,w,h);
+      resolve(c.toDataURL('image/jpeg',quality));
+    };
+    img.onerror=()=>{URL.revokeObjectURL(url);reject(new Error('이미지 로드 실패'))};
+    img.src=url;
+  });
+}
+async function uploadPhotos(owner,date,files){
+  let n=0;
+  for(const file of files){
+    if(!file.type||!file.type.startsWith('image/'))continue;
+    try{
+      const data=await resizeImage(file);
+      const id='p'+Date.now()+Math.floor(Math.random()*1000);
+      const ok=await rSet(photoKey(date,owner,id),{data,ts:Date.now()});
+      if(ok)n++;
+    }catch(e){console.error(e)}
+  }
+  return n;
+}
+async function listPhotos(date,owner){
+  try{
+    const r=await rList(photoPrefix(date,owner));
+    const keys=(r&&r.keys)?r.keys:[];
+    const out=[];
+    for(const k of keys){const v=await rGet(k);if(v&&v.data)out.push({key:k,data:v.data})}
+    return out;
+  }catch(e){return []}
+}
+async function deletePhoto(key){return await rDel(key)}
+async function renderPhotos(containerId,owner,date,editable){
+  const el=document.getElementById(containerId);
+  el.innerHTML='<div class="ph-empty">불러오는 중…</div>';
+  const photos=await listPhotos(date,owner);
+  if(!photos.length){el.innerHTML='<div class="ph-empty">아직 사진이 없습니다.</div>';return}
+  el.innerHTML=photos.map(p=>`<div class="thumb"><img src="${p.data}" loading="lazy">${editable?`<span class="thumb-x" data-key="${p.key}">×</span>`:''}</div>`).join('');
+  el.querySelectorAll('img').forEach(img=>img.onclick=()=>openLightbox(img.src));
+  if(editable)el.querySelectorAll('.thumb-x').forEach(x=>x.onclick=async(ev)=>{ev.stopPropagation();if(confirm('이 사진을 삭제할까요?')){await deletePhoto(x.dataset.key);renderPhotos(containerId,owner,date,editable)}});
+}
+function openLightbox(src){document.getElementById('lbImg').src=src;document.getElementById('lightbox').classList.add('show')}
+document.getElementById('lightbox').addEventListener('click',()=>document.getElementById('lightbox').classList.remove('show'));
+
+/* photo upload wiring */
+async function handleUpload(inputId,btnId,owner,date,containerId){
+  const input=document.getElementById(inputId);
+  const files=input.files; if(!files||!files.length)return;
+  const btn=document.getElementById(btnId); btn.classList.add('busy'); const orig=btn.firstChild.textContent; btn.firstChild.textContent='업로드 중…';
+  const n=await uploadPhotos(owner,date,files);
+  input.value='';
+  btn.classList.remove('busy'); btn.firstChild.textContent=orig;
+  if(n>0){toast(n+'장 업로드 완료 ✓');await renderPhotos(containerId,owner,date,true)}
+  else toast('업로드할 이미지가 없습니다');
+}
+document.getElementById('storePhotoInput').addEventListener('change',()=>{
+  if(current&&current!=='ADMN'&&current!=='PUP')handleUpload('storePhotoInput','storePhotoBtn',current,selDate,'storePhotos');
+});
+document.getElementById('popupPhotoInput').addEventListener('change',()=>{
+  if(current==='PUP'&&selPopup&&selPopup!=='ALL')handleUpload('popupPhotoInput','popupPhotoBtn',pCode(selPopup),selDatePopup,'popupPhotos');
+});
+async function loadAdminPhotos(){
+  const D=selDateAdmin; const el=document.getElementById('adminPhotos');
+  el.innerHTML=`<div class="sec-h"><span class="sec-t">현장 사진</span><span class="sec-sub">불러오는 중…</span></div>`;
+  const owners=[];
+  ORDER.forEach(code=>owners.push({owner:code,name:STORES[code].name}));
+  const pl=(popupList&&popupList.length)?popupList:await getPopups();
+  pl.forEach(p=>owners.push({owner:pCode(p.id),name:p.name}));
+  let html='',any=false;
+  for(const o of owners){
+    const photos=await listPhotos(D,o.owner);
+    if(!photos.length)continue; any=true;
+    html+=`<div class="ph-group"><div class="ph-name">${esc(o.name)} <span style="color:var(--ink-3);font-weight:400">${photos.length}장</span></div><div class="thumbs">`+
+      photos.map(p=>`<div class="thumb"><img src="${p.data}" loading="lazy"></div>`).join('')+`</div></div>`;
+  }
+  el.innerHTML=`<div class="sec-h"><span class="sec-t">현장 사진</span><span class="sec-sub">${dateLabel(D)}</span></div>`+
+    (any?html:'<div class="ph-empty" style="padding:6px 0 14px">등록된 사진이 없습니다.</div>');
+  el.querySelectorAll('img').forEach(img=>img.onclick=()=>openLightbox(img.src));
+}
+const repKey=(d,c)=>`report:${d}:${c}`;
+const aggKey=(c)=>`agg:${c}`;
+const wKey=(date,c)=>`agg:w:${weekId(date)}:${c}`;
+const mKey=(date,c)=>`agg:m:${monthId(date)}:${c}`;
+async function getReport(d,c){return await rGet(repKey(d,c))}
+
+function blankAgg(){return {photo:0,capsule:0,product:0}}
+function applyDelta(agg,data,prev){
+  agg.photo  +=(data.photo||0)-(prev.photo||0);
+  agg.capsule+=(data.capsule||0)-(prev.capsule||0);
+  agg.product+=(data.product||0)-(prev.product||0);
+  return agg;
+}
+async function saveReport(code,data,date){
+  const prev=await getReport(date,code)||blankAgg();
+  const camp=(await rGet(aggKey(code)))||blankAgg();
+  const wk  =(await rGet(wKey(date,code)))||blankAgg();
+  const mo  =(await rGet(mKey(date,code)))||blankAgg();
+  await rSet(aggKey(code),applyDelta(camp,data,prev));
+  await rSet(wKey(date,code),applyDelta(wk,data,prev));
+  await rSet(mKey(date,code),applyDelta(mo,data,prev));
+  await rSet(repKey(date,code),{...data,ts:Date.now()});
+  return camp;
+}
+
+/* login */
+const codeInput=document.getElementById('code');
+document.getElementById('loginBtn').addEventListener('click',doLogin);
+codeInput.addEventListener('keyup',e=>{if(e.key==='Enter')doLogin()});
+function resolveCode(v){if(v===adminPw)return 'ADMN';if(v===popupCode)return 'PUP';if(v===extCode)return 'EXT';for(const k in STORES)if(STORES[k].code===v)return k;return null}
+async function doLogin(){
+  const v=codeInput.value.trim();
+  const err=document.getElementById('loginErr');
+  err.textContent='';
+  // 서버 연결 안 돼도 기본 입장번호로 로그인 가능하게
+  if(!MEM_LOADED){
+    try{await loadAll();}catch(e){}
+    try{await loadStores();}catch(e){}
+  }
+  const who=resolveCode(v);
+  if(!who){err.textContent='코드가 올바르지 않습니다.';return}
+  current=who;
+  selDate=today(); selDateAdmin=today(); selDatePopup=today();
+  if(who==='ADMN')await openAdmin();
+  else if(who==='PUP')await openPopupHub();
+  else if(who==='EXT')await openExtHub();
+  else await openStore(who);
+}
+function logout(){if(refreshTimer){clearInterval(refreshTimer);refreshTimer=null}current=null;codeInput.value='';document.getElementById('loginErr').textContent='';show('s-login');codeInput.focus()}
+
+/* store */
+const ids=['inPhoto','inCapsule','inProduct','inAtv'];
+ids.forEach(id=>{const el=document.getElementById(id);el.addEventListener('input',()=>{commafy(el);if(current&&current!=='ADMN'&&current!=='PUP')refreshStore(current)})});
+
+function readForm(){
+  return {
+    photo:num(document.getElementById('inPhoto').value),
+    capsule:num(document.getElementById('inCapsule').value),
+    product:num(document.getElementById('inProduct').value),
+    atv:num(document.getElementById('inAtv').value),
+    memo:document.getElementById('inMemo').value.trim(),
+    hits:document.getElementById('inHits').value.trim(),
+  };
+}
+function formTotal(f){return f.photo+f.capsule+f.product}
+
+async function openStore(code){
+  show('s-store');
+  await loadAll();
+  const s=STORES[code];
+  document.getElementById('storeName').textContent=s.name;
+  document.getElementById('storeDate').textContent=dateLabel(selDate)+' · 코드 '+code;
+  document.getElementById('storePick').value=selDate;
+  await renderStoreStrip(code);
+
+  ['inPhoto','inCapsule','inProduct','inAtv','inMemo','inHits'].forEach(id=>document.getElementById(id).value='');
+  const r=await getReport(selDate,code);
+  if(r){
+    document.getElementById('inPhoto').value=r.photo?r.photo.toLocaleString('ko-KR'):'';
+    document.getElementById('inCapsule').value=r.capsule?r.capsule.toLocaleString('ko-KR'):'';
+    document.getElementById('inProduct').value=r.product?r.product.toLocaleString('ko-KR'):'';
+    document.getElementById('inAtv').value=r.atv?r.atv.toLocaleString('ko-KR'):'';
+    document.getElementById('inMemo').value=r.memo||'';
+    document.getElementById('inHits').value=r.hits||'';
+  }
+  const ys=await yearSums(code,selDate,false);
+  storeYearOther=ys.other; storeYTDPrior=ys.prior; storeLastYTD=ys.lastYTD;
+  await refreshStore(code);
+  await renderPhotos('storePhotos',code,selDate,true);
+
+  document.getElementById('saveBtn').onclick=async()=>{
+    const f=readForm();
+    if(formTotal(f)<=0){toast('포토·캡슐·상품 매출을 입력해 주세요');return}
+    const b=document.getElementById('saveBtn');b.disabled=true;b.textContent='저장 중…';
+    const agg=await saveReport(code,f,selDate);
+    b.disabled=false;b.textContent='보고 저장 · 공유';
+    if(agg===false){toast('저장 실패. 다시 시도해 주세요');return}
+    toast(shortDate(selDate)+' 보고가 저장·공유되었습니다 ✓');
+    await renderStoreStrip(code);
+    await refreshStore(code);
+  };
+  document.getElementById('copyBtn').onclick=()=>copyText(buildReportText(code,readForm(),lastAgg));
+  document.getElementById('holidayBtn').onclick=async()=>{
+    if(!confirm(`${selDate} ${s.name} 점포 휴무로 저장할까요?`))return;
+    await saveReport(code,{photo:0,capsule:0,product:0,atv:0,memo:'점휴',hits:''},selDate);
+    toast('점포 휴무(점휴)로 저장했습니다 ✓');
+    await openStore(code);
+  };
+}
+
+async function renderStoreStrip(code){
+  const strip=document.getElementById('storeStrip');
+  const days=[]; let d=today();
+  for(let i=0;i<14;i++){days.push(d);d=prevDay(d)}
+  if(!days.includes(selDate))days.push(selDate);
+  days.sort();
+  const hasMap={};
+  await Promise.all(days.map(async dt=>{hasMap[dt]=!!(await getReport(dt,code))}));
+  strip.innerHTML=days.map(dt=>{
+    const dd=parseD(dt),wd=dd.getDay();
+    const cls=['dchip'];
+    if(dt===selDate)cls.push('on'); if(hasMap[dt])cls.push('has');
+    if(wd===6)cls.push('sat'); if(wd===0)cls.push('sun');
+    const label=dt===today()?'오늘':DOW[wd];
+    return `<div class="${cls.join(' ')}" data-d="${dt}"><div class="dd">${dd.getMonth()+1}/${dd.getDate()}</div><div class="dw">${label}</div></div>`;
+  }).join('');
+  strip.querySelectorAll('.dchip').forEach(el=>el.onclick=()=>{selDate=el.dataset.d;openStore(code)});
+  const onEl=strip.querySelector('.dchip.on'); if(onEl)onEl.scrollIntoView({inline:'center',block:'nearest'});
+}
+document.getElementById('storePick').addEventListener('change',e=>{if(e.target.value){selDate=e.target.value;openStore(current)}});
+
+let lastAgg={photo:0,capsule:0,product:0,popup:0};
+let lastWeekSum=0, lastMonthSum=0;
+let lastYearTotal=0;                 // 연간 합계 (선택연도)
+let storeYearOther=0, storeYTDPrior=0, storeLastYTD=0;
+let popupYearOther=0, popupYTDPrior=0, popupLastYTD=0;
+// 한 해의 월별 집계로부터: other(현재월 제외 전월합), prior(1~선택월-1), lastYTD(전년 1~선택월)
+async function yearSums(owner,date,isPopup){
+  const yr=parseD(date).getFullYear(); const selM=parseD(date).getMonth()+1;
+  const val=a=>!a?0:(isPopup?(a.sales||0):((a.photo||0)+(a.capsule||0)+(a.product||0)));
+  let other=0,prior=0,lastYTD=0;
+  for(let m=1;m<=12;m++){
+    const v=val(await rGet(`agg:m:${yr}-${pad(m)}:${owner}`));
+    if(m!==selM)other+=v;
+    if(m<selM)prior+=v;
+  }
+  for(let m=1;m<=selM;m++){lastYTD+=val(await rGet(`agg:m:${yr-1}-${pad(m)}:${owner}`))}
+  return {other,prior,lastYTD};
+}
+async function refreshStore(code){
+  const f=readForm(); const tot=formTotal(f);
+  document.getElementById('storeTotal').textContent=won(tot);
+  setM('mToday',won(tot),'');
+
+  // live aggregates = stored - savedSelDate + currentForm
+  const saved=await getReport(selDate,code)||blankAgg();
+  const live=async(key)=>{
+    const a=(await rGet(key))||blankAgg();
+    return {
+      photo:a.photo-(saved.photo||0)+f.photo,
+      capsule:a.capsule-(saved.capsule||0)+f.capsule,
+      product:a.product-(saved.product||0)+f.product,
+    };
+  };
+  const wk=await live(wKey(selDate,code));
+  const mo=await live(mKey(selDate,code));
+  const sum=a=>a.photo+a.capsule+a.product;
+  lastWeekSum=sum(wk); lastMonthSum=sum(mo);
+  const yearTot=storeYearOther+sum(mo);
+  lastYearTotal=yearTot;
+
+  setM('mWeek', won(sum(wk)), '');
+  setM('mMonth',won(sum(mo)),'');
+
+  // 전년 동요일/동주/동월 비교
+  const lyDate=lastYearSameDOW(selDate);
+  const lyDay=await getReport(lyDate,code);
+  const lyDayTot=lyDay?(lyDay.photo+lyDay.capsule+lyDay.product):0;
+  const lyWk=(await rGet(wKey(lyDate,code)))||blankAgg();
+  const lyMo=(await rGet(mKey(lastYearMonthId(selDate)+'-01',code)))||blankAgg();
+  document.getElementById('mTodayYoY').innerHTML=yoyHtml(tot,lyDayTot,'전년');
+  document.getElementById('mWeekYoY').innerHTML=yoyHtml(sum(wk),sum(lyWk),'전년');
+  document.getElementById('mMonthYoY').innerHTML=yoyHtml(sum(mo),sum(lyMo),'전년');
+
+  const yr=parseD(selDate).getFullYear();
+  let sub=`연간 합계 <b>${won(yearTot)}</b> <span style="color:var(--ink-3)">(${yr}년)</span>`;
+  if(storeLastYTD>0){const thisYTD=storeYTDPrior+sum(mo);const dd=Math.round((thisYTD-storeLastYTD)/storeLastYTD*100);sub+=` · 전년 <span class="${dd>=0?'pos':'neg'}">${dd>=0?'+':''}${dd}%</span>`}
+  document.getElementById('storeSub').innerHTML=sub;
+}
+function setM(id,v,cls){const el=document.getElementById(id);el.innerHTML=v;el.className='m-v'+(cls?' '+cls:'')}
+
+function buildReportText(code,f,agg){
+  const tot=formTotal(f);
+  let t=`${shortDate(selDate)}\n\n`;
+  t+=`총 ${won(tot)}\n/연간합계 ${won(lastYearTotal)}\n`;
+  t+=`/주간 ${won(lastWeekSum)}\n/월간 ${won(lastMonthSum)}\n`;
+  t+=`ㅡ 포토 ${won(f.photo)}\n`;
+  t+=`ㅡ 캡슐 ${won(f.capsule)}\n`;
+  t+=`ㅡ 상품 ${won(f.product)}\n`;
+  t+=`객단가 ${won(f.atv)}\n`;
+  if(f.memo){t+=`\n${f.memo}\n`}
+  if(f.hits){
+    t+=`\n인기상품\n`;
+    f.hits.split('\n').map(x=>x.trim()).filter(Boolean).forEach(x=>{t+=`*${x}\n`});
+  }
+  return t.trim();
+}
+
+/* ===== POPUP ===== */
+const pCode=(id)=>`PUP:${id}`;
+async function getPopupReport(date,id){return await rGet(repKey(date,pCode(id)))}
+async function getPopups(){
+  let list=await rGet('popups:list');
+  if(!list||!list.length){list=POPUP_SEED.slice();await rSet('popups:list',list)}
+  popupList=list; return list;
+}
+async function addPopupLocation(name,start,end){
+  const list=await getPopups();
+  list.push({id:'PU'+Date.now(),name,start:start||'',end:end||''});
+  await rSet('popups:list',list); popupList=list; return list;
+}
+async function updatePopupLocation(id,fields){
+  const list=await getPopups();
+  const p=list.find(x=>x.id===id); if(p)Object.assign(p,fields);
+  await rSet('popups:list',list); popupList=list; return list;
+}
+async function removePopupLocation(id){
+  let list=await getPopups();
+  list=list.filter(x=>x.id!==id);
+  await rSet('popups:list',list); popupList=list; return list;
+}
+function popupStatus(p,date){
+  date=date||today();
+  if(p.start&&date<p.start)return {label:'운영예정',cls:'st-soon'};
+  if(p.end&&date>p.end)return {label:'운영종료',cls:'st-end'};
+  // start/end 둘 다 없으면 → 데이터 없는 미설정 매장 → 대기
+  if(!p.start&&!p.end)return {label:'대기',cls:'st-soon'};
+  let dleft='';
+  if(p.end){const days=Math.round((parseD(p.end)-parseD(date))/86400000);if(days>=0)dleft=' D-'+days}
+  return {label:'운영중'+dleft,cls:'st-live'};
+}
+function popupPeriod(p){
+  if(!p.start&&!p.end)return '기간 미설정';
+  const f=s=>{if(!s)return '';const d=parseD(s);return `${d.getMonth()+1}/${d.getDate()}`};
+  return `${f(p.start)||'~'} ~ ${f(p.end)||'미정'}`;
+}
+
+/* ═══ 외부채널 (포토부스·캡슐토이) ═══ */
+const EXT_SEED=[
+  {id:'EX1',name:'메가박스 목동',start:'',end:''},
+  {id:'EX2',name:'메가박스 수원',start:'',end:''},
+  {id:'EX3',name:'메가박스 강남',start:'',end:''},
+];
+let extList=[];
+const xCode=(id)=>`EXT:${id}`;
+async function getExtReport(date,id){return await rGet(repKey(date,xCode(id)))}
+async function getExts(){
+  let list=await rGet('ext:list');
+  if(!list||!list.length){list=EXT_SEED.slice();await rSet('ext:list',list)}
+  extList=list; return list;
+}
+async function addExtLocation(name,start,end){
+  const list=await getExts();
+  list.push({id:'EX'+Date.now(),name,start:start||'',end:end||''});
+  await rSet('ext:list',list); extList=list; return list;
+}
+async function updateExtLocation(id,fields){
+  const list=await getExts();
+  const p=list.find(x=>x.id===id); if(p)Object.assign(p,fields);
+  await rSet('ext:list',list); extList=list; return list;
+}
+async function removeExtLocation(id){
+  let list=await getExts();
+  list=list.filter(x=>x.id!==id);
+  await rSet('ext:list',list); extList=list; return list;
+}
+async function saveExt(id,data,date){
+  const prev=await getExtReport(date,id)||{photo:0,capsule:0};
+  const camp=(await rGet(aggKey(xCode(id))))||{photo:0,capsule:0};
+  const wk  =(await rGet(wKey(date,xCode(id))))||{photo:0,capsule:0};
+  const mo  =(await rGet(mKey(date,xCode(id))))||{photo:0,capsule:0};
+  const dp=(data.photo||0)-(prev.photo||0), dc=(data.capsule||0)-(prev.capsule||0);
+  camp.photo=(camp.photo||0)+dp; camp.capsule=(camp.capsule||0)+dc;
+  wk.photo=(wk.photo||0)+dp; wk.capsule=(wk.capsule||0)+dc;
+  mo.photo=(mo.photo||0)+dp; mo.capsule=(mo.capsule||0)+dc;
+  await rSet(aggKey(xCode(id)),camp);
+  await rSet(wKey(date,xCode(id)),wk);
+  await rSet(mKey(date,xCode(id)),mo);
+  await rSet(repKey(date,xCode(id)),{...data,ts:Date.now()});
+  return true;
+}
+const sumX=r=>((r&&r.photo)||0)+((r&&r.capsule)||0);
+async function savePopup(id,data,date){
+  const prev=await getPopupReport(date,id)||{sales:0};
+  const camp=(await rGet(aggKey(pCode(id))))||{sales:0};
+  const wk  =(await rGet(wKey(date,pCode(id))))||{sales:0};
+  const mo  =(await rGet(mKey(date,pCode(id))))||{sales:0};
+  const d=(data.sales||0)-(prev.sales||0);
+  camp.sales=(camp.sales||0)+d; wk.sales=(wk.sales||0)+d; mo.sales=(mo.sales||0)+d;
+  await rSet(aggKey(pCode(id)),camp);
+  await rSet(wKey(date,pCode(id)),wk);
+  await rSet(mKey(date,pCode(id)),mo);
+  await rSet(repKey(date,pCode(id)),{...data,ts:Date.now()});
+  return camp;
+}
+
+async function openPopupHub(){
+  show('s-popup');
+  await loadAll();
+  await getPopups();
+  if(!selPopup) selPopup='ALL';
+  if(selPopup!=='ALL' && !popupList.find(p=>p.id===selPopup)) selPopup='ALL';
+  renderPopupTabs();
+  await routePopup();
+  document.getElementById('addPopupBtn').onclick=async()=>{
+    const name=prompt('추가할 팝업 매장명을 입력하세요 (예: 더현대_팝업)');
+    if(name&&name.trim()){await addPopupLocation(name.trim());selPopup=popupList[popupList.length-1].id;renderPopupTabs();await routePopup();toast('추가되었습니다 ✓')}
+  };
+}
+function renderPopupTabs(){
+  const wrap=document.getElementById('popupTabs');
+  let tabs=`<div class="ptab${selPopup==='ALL'?' on':''}" data-id="ALL">합계</div>`;
+  const _stOrd=c=>c==='st-live'?0:c==='st-soon'?1:2;
+  const sortedPopups=[...popupList].sort((a,b)=>_stOrd(popupStatus(a,selDatePopup).cls)-_stOrd(popupStatus(b,selDatePopup).cls));
+  tabs+=sortedPopups.map(p=>`<div class="ptab${p.id===selPopup?' on':''}" data-id="${p.id}">${esc(p.name)}</div>`).join('');
+  wrap.innerHTML=tabs;
+  wrap.querySelectorAll('.ptab').forEach(el=>el.onclick=()=>{selPopup=el.dataset.id;renderPopupTabs();routePopup()});
+}
+async function routePopup(){
+  renderPopupSchedule();
+  if(selPopup==='ALL'){
+    document.getElementById('popupEntry').style.display='none';
+    document.getElementById('popupSummary').style.display='block';
+    await openPopupSummary();
+  } else {
+    document.getElementById('popupSummary').style.display='none';
+    document.getElementById('popupEntry').style.display='block';
+    await openPopupReport();
+  }
+}
+function renderPopupSchedule(){
+  const el=document.getElementById('popupSchedule');
+  if(selPopup==='ALL'){
+    const live=popupList.filter(p=>popupStatus(p,selDatePopup).cls==='st-live').length;
+    el.innerHTML=`<span class="st st-live">운영중 ${live}곳</span> <span style="color:var(--ink-3)">전체 ${popupList.length}개 팝업</span>`;
+    return;
+  }
+  const p=popupList.find(x=>x.id===selPopup); if(!p){el.innerHTML='';return}
+  const s=popupStatus(p,selDatePopup);
+  el.innerHTML=`<span class="st ${s.cls}">${s.label}</span> <span>운영기간 ${popupPeriod(p)}</span>`;
+}
+
+let pLastAgg=0,pLastWeek=0,pLastMonth=0;
+function readPopupForm(){
+  return {
+    sales:num(document.getElementById('inPSales').value),
+    atv:num(document.getElementById('inPAtv').value),
+    memo:document.getElementById('inPMemo').value.trim(),
+    hits:document.getElementById('inPHits').value.trim(),
+  };
+}
+async function openPopupReport(){
+  const p=popupList.find(x=>x.id===selPopup); if(!p)return;
+  document.getElementById('popupDate').textContent=p.name+' · '+dateLabel(selDatePopup);
+  document.getElementById('popupPick').value=selDatePopup;
+  await renderPopupStrip();
+  ['inPSales','inPAtv','inPMemo','inPHits'].forEach(id=>document.getElementById(id).value='');
+  const r=await getPopupReport(selDatePopup,selPopup);
+  if(r){
+    document.getElementById('inPSales').value=r.sales?r.sales.toLocaleString('ko-KR'):'';
+    document.getElementById('inPAtv').value=r.atv?r.atv.toLocaleString('ko-KR'):'';
+    document.getElementById('inPMemo').value=r.memo||'';
+    document.getElementById('inPHits').value=r.hits||'';
+  }
+  const ys=await yearSums(pCode(selPopup),selDatePopup,true);
+  popupYearOther=ys.other; popupYTDPrior=ys.prior; popupLastYTD=ys.lastYTD;
+  await refreshPopup();
+  await renderPhotos('popupPhotos',pCode(selPopup),selDatePopup,true);
+  document.getElementById('pSaveBtn').onclick=async()=>{
+    const f=readPopupForm();
+    if(f.sales<=0){toast('팝업 매출을 입력해 주세요');return}
+    const b=document.getElementById('pSaveBtn');b.disabled=true;b.textContent='저장 중…';
+    await savePopup(selPopup,f,selDatePopup);
+    b.disabled=false;b.textContent='보고 저장 · 공유';
+    toast(shortDate(selDatePopup)+' 보고가 저장·공유되었습니다 ✓');
+    await renderPopupStrip(); await refreshPopup();
+  };
+  document.getElementById('pCopyBtn').onclick=()=>copyText(buildPopupReportText());
+}
+async function refreshPopup(){
+  const f=readPopupForm(); const tot=f.sales;
+  document.getElementById('pToday').textContent=won(tot);
+  const saved=await getPopupReport(selDatePopup,selPopup)||{sales:0};
+  const live=async(key)=>{const a=(await rGet(key))||{sales:0};return (a.sales||0)-(saved.sales||0)+f.sales};
+  const wk=await live(wKey(selDatePopup,pCode(selPopup)));
+  const mo=await live(mKey(selDatePopup,pCode(selPopup)));
+  const yearTot=popupYearOther+mo;
+  pLastAgg=yearTot; pLastWeek=wk; pLastMonth=mo;
+  document.getElementById('pWeek').textContent=won(wk);
+  document.getElementById('pMonth').textContent=won(mo);
+  // 전년 동요일/동주/동월
+  const lyDate=lastYearSameDOW(selDatePopup);
+  const lyDay=await getPopupReport(lyDate,selPopup);
+  const lyDayTot=lyDay?(lyDay.sales||0):0;
+  const lyWk=((await rGet(wKey(lyDate,pCode(selPopup))))||{sales:0}).sales||0;
+  const lyMo=((await rGet(mKey(lastYearMonthId(selDatePopup)+'-01',pCode(selPopup))))||{sales:0}).sales||0;
+  document.getElementById('pTodayYoY').innerHTML=yoyHtml(tot,lyDayTot,'전년');
+  document.getElementById('pWeekYoY').innerHTML=yoyHtml(wk,lyWk,'전년');
+  document.getElementById('pMonthYoY').innerHTML=yoyHtml(mo,lyMo,'전년');
+  const yr=parseD(selDatePopup).getFullYear();
+  let sub=`연간 합계 <b>${won(yearTot)}</b> <span style="color:var(--ink-3)">(${yr}년)</span>`;
+  if(popupLastYTD>0){const thisYTD=popupYTDPrior+mo;const dd=Math.round((thisYTD-popupLastYTD)/popupLastYTD*100);sub+=` · 전년 <span class="${dd>=0?'pos':'neg'}">${dd>=0?'+':''}${dd}%</span>`}
+  document.getElementById('popupSub').innerHTML=sub;
+}
+function buildPopupReportText(){
+  const p=popupList.find(x=>x.id===selPopup); const f=readPopupForm();
+  let t=`${shortDate(selDatePopup)} [${p?p.name:''}]\n\n`;
+  t+=`팝업매출: ${won(f.sales)}\n/연간합계 ${won(pLastAgg)}\n/주간 ${won(pLastWeek)}\n/월간 ${won(pLastMonth)}\n`;
+  t+=`객단가 ${won(f.atv)}\n`;
+  if(f.memo){t+=`\n${f.memo}\n`}
+  if(f.hits){t+=`\n인기상품\n`;f.hits.split('\n').map(x=>x.trim()).filter(Boolean).forEach(x=>{t+=`*${x}\n`})}
+  return t.trim();
+}
+
+/* ----- 팝업 합계(ALL) view ----- */
+let popupAllCopy='';
+async function openPopupSummary(){
+  document.getElementById('popupDate').textContent='전체 합계 · '+dateLabel(selDatePopup);
+  document.getElementById('popupPick').value=selDatePopup;
+  await renderPopupStrip();
+  let dayTot=0,wkTot=0,moTot=0,campTot=0; const list=[];
+  for(const p of popupList){
+    const r=await getPopupReport(selDatePopup,p.id);
+    const wk=(await rGet(wKey(selDatePopup,pCode(p.id))))||{sales:0};
+    const mo=(await rGet(mKey(selDatePopup,pCode(p.id))))||{sales:0};
+    const camp=(await rGet(aggKey(pCode(p.id))))||{sales:0};
+    const s=r?(r.sales||0):0;
+    dayTot+=s; wkTot+=(wk.sales||0); moTot+=(mo.sales||0); campTot+=(camp.sales||0);
+    list.push({p,s,reported:!!r,wk:wk.sales||0,mo:mo.sales||0});
+  }
+  document.getElementById('paToday').textContent=won(dayTot);
+  document.getElementById('paWeek').textContent=won(wkTot);
+  document.getElementById('paMonth').textContent=won(moTot);
+  document.getElementById('paSub').innerHTML=`팝업 누적 합계 <b>${won(campTot)}</b>`;
+  document.getElementById('paBreakdown').innerHTML=list.map(({p,s,reported,wk,mo})=>`
+    <div class="brk">
+      <div class="brk-l"><span class="brk-n">${esc(p.name)}</span>${reported?'':'<span class="brk-wait">미보고</span>'}</div>
+      <div class="brk-r"><b>${won(s)}</b><span class="brk-sub">주 ${won(wk)} · 월 ${won(mo)}</span></div>
+    </div>`).join('') || '<div style="font-size:13px;color:var(--ink-3);padding:6px 0">등록된 팝업 매장이 없습니다.</div>';
+
+  // combined copy text
+  popupAllCopy=`${shortDate(selDatePopup)} [팝업 합계]\n\n`+
+    `팝업 당일 합계: ${won(dayTot)}\n/주간 ${won(wkTot)}\n/월간 ${won(moTot)}\n\n`+
+    list.map(({p,s,reported})=>`· ${p.name}: ${reported?won(s):'미보고'}`).join('\n');
+  document.getElementById('paCopyBtn').onclick=()=>copyText(popupAllCopy);
+}
+
+async function renderPopupStrip(){
+  const strip=document.getElementById('popupStrip');
+  const days=[]; let d=today();
+  for(let i=0;i<14;i++){days.push(d);d=prevDay(d)}
+  if(!days.includes(selDatePopup))days.push(selDatePopup);
+  days.sort();
+  const hasMap={};
+  await Promise.all(days.map(async dt=>{
+    if(selPopup==='ALL'){
+      let any=false;
+      for(const p of popupList){ if(await getPopupReport(dt,p.id)){any=true;break} }
+      hasMap[dt]=any;
+    } else hasMap[dt]=!!(await getPopupReport(dt,selPopup));
+  }));
+  strip.innerHTML=days.map(dt=>{
+    const dd=parseD(dt),wd=dd.getDay();const cls=['dchip'];
+    if(dt===selDatePopup)cls.push('on'); if(hasMap[dt])cls.push('has');
+    if(wd===6)cls.push('sat'); if(wd===0)cls.push('sun');
+    const label=dt===today()?'오늘':DOW[wd];
+    return `<div class="${cls.join(' ')}" data-d="${dt}"><div class="dd">${dd.getMonth()+1}/${dd.getDate()}</div><div class="dw">${label}</div></div>`;
+  }).join('');
+  strip.querySelectorAll('.dchip').forEach(el=>el.onclick=()=>{selDatePopup=el.dataset.d;routePopup()});
+  const onEl=strip.querySelector('.dchip.on');if(onEl)onEl.scrollIntoView({inline:'center',block:'nearest'});
+}
+['inPSales','inPAtv'].forEach(id=>{const el=document.getElementById(id);el.addEventListener('input',()=>{commafy(el);if(current==='PUP'&&selPopup&&selPopup!=='ALL')refreshPopup()})});
+document.getElementById('popupPick').addEventListener('change',e=>{if(e.target.value){selDatePopup=e.target.value;routePopup()}});
+
+/* admin */
+async function openAdmin(){
+  show('s-admin');
+  document.getElementById('adminPick').value=selDateAdmin;
+  renderAdminStrip();
+  document.getElementById('storeList').innerHTML='<div class="loading">매장 보고를 불러오는 중…</div>';
+  await getPopups();
+  await computeAdminLastYear();
+  await loadAdmin();
+  await loadAdminPhotos();
+  if(refreshTimer)clearInterval(refreshTimer);
+  refreshTimer=setInterval(loadAdmin,30000);
+  document.getElementById('adminCopyBtn').onclick=()=>copyText(adminSummaryText);
+  document.getElementById('excelBtn').onclick=exportExcel;
+  document.getElementById('tsvBtn').onclick=exportTSV;
+  document.getElementById('manageBtn').onclick=openManage;
+}
+
+/* ===== consolidated sheet export ===== */
+async function gatherAllReports(){
+  const pl=(popupList&&popupList.length)?popupList:await getPopups();
+  const nameOf=id=>{const p=pl.find(x=>x.id===id);return p?p.name:id};
+  let keys=[];
+  try{const r=await rList('report:');keys=(r&&r.keys)?r.keys:[]}catch(e){}
+  const direct=[],popup=[];
+  for(const k of keys){
+    const parts=k.split(':'); const date=parts[1];
+    const v=await rGet(k); if(!v)continue;
+    if(parts[2]==='PUP'){
+      const id=parts.slice(3).join(':');
+      popup.push({날짜:date,팝업매장:nameOf(id),팝업매출:v.sales||0,객단가:v.atv||0,코멘트:v.memo||'',인기상품:(v.hits||'').replace(/\n/g,' / ')});
+    }else{
+      const code=parts[2]; const s=STORES[code];
+      direct.push({날짜:date,매장:s?s.name:code,포토:v.photo||0,캡슐:v.capsule||0,상품:v.product||0,총매출:(v.photo||0)+(v.capsule||0)+(v.product||0),객단가:v.atv||0,코멘트:v.memo||'',인기상품:(v.hits||'').replace(/\n/g,' / ')});
+    }
+  }
+  const bd=(a,b,f)=>a.날짜<b.날짜?-1:a.날짜>b.날짜?1:(a[f]<b[f]?-1:1);
+  direct.sort((a,b)=>bd(a,b,'매장')); popup.sort((a,b)=>bd(a,b,'팝업매장'));
+  // daily summary
+  const byDate={};
+  direct.forEach(r=>{(byDate[r.날짜]=byDate[r.날짜]||{직영:0,팝업:0}).직영+=r.총매출});
+  popup.forEach(r=>{(byDate[r.날짜]=byDate[r.날짜]||{직영:0,팝업:0}).팝업+=r.팝업매출});
+  const summary=Object.keys(byDate).sort().map(d=>({날짜:d,직영합계:byDate[d].직영,팝업합계:byDate[d].팝업,전체합계:byDate[d].직영+byDate[d].팝업}));
+  return {direct,popup,summary};
+}
+async function exportExcel(){
+  const btn=document.getElementById('excelBtn'); btn.disabled=true; btn.textContent='생성 중…';
+  try{
+    const {direct,popup,summary}=await gatherAllReports();
+    if(typeof XLSX==='undefined'){toast('엑셀 모듈 로드 실패 — "시트 복사"를 이용하세요');return}
+    if(!direct.length&&!popup.length){toast('내보낼 보고 데이터가 없습니다');return}
+    const wb=XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(summary.length?summary:[{날짜:'',직영합계:'',팝업합계:'',전체합계:''}]),'일자별_합계');
+    XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(direct.length?direct:[{날짜:'',매장:'',포토:'',캡슐:'',상품:'',총매출:'',객단가:'',코멘트:'',인기상품:''}]),'직영_일별');
+    XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(popup.length?popup:[{날짜:'',팝업매장:'',팝업매출:'',객단가:'',코멘트:'',인기상품:''}]),'팝업_일별');
+    XLSX.writeFile(wb,`PITB_매출취합_${today()}.xlsx`);
+    toast('엑셀 시트를 내려받았습니다 ✓');
+  }catch(e){console.error(e);toast('다운로드 실패 — "시트 복사"를 이용하세요')}
+  finally{btn.disabled=false; btn.textContent='📊 엑셀 시트 다운로드'}
+}
+async function exportTSV(){
+  const {direct,popup}=await gatherAllReports();
+  if(!direct.length&&!popup.length){toast('내보낼 보고 데이터가 없습니다');return}
+  const toTSV=(rows,cols)=>cols.join('\t')+'\n'+rows.map(r=>cols.map(c=>String(r[c]??'').replace(/[\t\n]/g,' ')).join('\t')).join('\n');
+  const dCols=['날짜','매장','포토','캡슐','상품','총매출','객단가','코멘트','인기상품'];
+  const pCols=['날짜','팝업매장','팝업매출','객단가','코멘트','인기상품'];
+  const text='[직영 매장]\n'+toTSV(direct,dCols)+'\n\n[팝업 매장]\n'+toTSV(popup,pCols);
+  copyText(text,'시트 복사됨 ✓ 엑셀/구글시트에 붙여넣으세요');
+}
+
+/* ===== 매장 관리 ===== */
+function backToAdmin(){ openAdmin(); }
+async function openManage(){
+  if(refreshTimer){clearInterval(refreshTimer);refreshTimer=null}
+  show('s-manage');
+  await loadAll();
+  await loadStores();
+  await getPopups();
+  renderManage();
+  renderManageB2B();
+  await getExts();
+  renderManageExts();
+  document.getElementById('addExtMBtn').onclick=onAddExtM;
+  document.getElementById('setExtCodeBtn').onclick=onSetExtCode;
+  document.getElementById('newB2BDate').value=today();
+  document.getElementById('addStoreBtn').onclick=onAddStore;
+  document.getElementById('addPopupMBtn').onclick=onAddPopupM;
+  document.getElementById('addB2BMBtn').onclick=onAddB2BM;
+  document.getElementById('tmplBtn').onclick=downloadTemplate;
+  document.getElementById('setAdminPwBtn').onclick=onSetAdminPw;
+  document.getElementById('setPopupCodeBtn').onclick=onSetPopupCode;
+  document.getElementById('importInput').onchange=async(e)=>{
+    const f=e.target.files&&e.target.files[0];
+    if(f){await importExcel(f); e.target.value=''}
+  };
+}
+function renderManage(){
+  // regular stores (editable PIN with explicit 변경 button)
+  const sEl=document.getElementById('manageStores');
+  sEl.innerHTML=ORDER.map(id=>{
+    const s=STORES[id]; const isSeed=SEED_ORDER.includes(id);
+    return `<div class="mrow">
+      <span class="mn">${esc(s.name)}${isSeed?' <span class="mc">기본</span>':''}</span>
+      <input class="pin-in" inputmode="numeric" maxlength="8" value="${s.code}" data-pin="${id}">
+      <button class="btn btn-primary pin-save" data-pin="${id}" style="width:auto;margin-top:0;padding:7px 12px">변경</button>
+      ${isSeed?'':`<button class="mdel" data-id="${id}">삭제</button>`}
+    </div>`;
+  }).join('');
+  sEl.querySelectorAll('.pin-save').forEach(b=>b.onclick=async()=>{
+    const id=b.dataset.pin; const old=STORES[id].code;
+    const inp=sEl.querySelector(`.pin-in[data-pin="${id}"]`);
+    const pin=inp.value.trim();
+    if(pin===old){toast('변경된 내용이 없습니다');return}
+    if(!/^\d{4,8}$/.test(pin)){toast('입장번호는 숫자 4~8자리로 입력하세요');inp.value=old;return}
+    const taken=allPins(); taken.delete(old);
+    if(taken.has(pin)){toast('이미 사용 중인 번호입니다');inp.value=old;return}
+    const ok=await setStorePin(id,pin); renderManage();
+    toast(ok?`'${STORES[id].name}' 입장번호가 변경되었습니다 ✓`:'저장에 실패했습니다. 잠시 후 다시 시도해 주세요');
+  });
+  sEl.querySelectorAll('.mdel').forEach(b=>b.onclick=async()=>{
+    if(confirm('이 매장을 삭제할까요? (입력된 매출 기록은 남아 있습니다)')){await removeStore(b.dataset.id);renderManage();toast('삭제되었습니다')}
+  });
+  // popups with schedule
+  const pEl=document.getElementById('managePopups');
+  const _sOrd=c=>c==='st-live'?0:c==='st-soon'?1:2;
+  const _sorted=[...popupList].sort((a,b)=>_sOrd(popupStatus(a,today()).cls)-_sOrd(popupStatus(b,today()).cls));
+  pEl.innerHTML=_sorted.map(p=>{
+    const st=popupStatus(p,today());
+    return `<div class="mrow">
+      <span class="mn">${esc(p.name)} <span class="st ${st.cls}">${st.label}</span></span>
+      <input type="date" value="${p.start||''}" data-id="${p.id}" data-f="start" title="시작일">
+      <input type="date" value="${p.end||''}" data-id="${p.id}" data-f="end" title="종료일">
+      <button class="mdel" data-del="${p.id}">삭제</button>
+    </div>`;
+  }).join('')||'<div class="ph-empty">등록된 팝업 매장이 없습니다.</div>';
+  pEl.querySelectorAll('input[type=date]').forEach(inp=>inp.onchange=async()=>{
+    await updatePopupLocation(inp.dataset.id,{[inp.dataset.f]:inp.value});
+    renderManage(); toast('운영일정이 저장되었습니다 ✓');
+  });
+  pEl.querySelectorAll('.mdel').forEach(b=>b.onclick=async()=>{
+    if(confirm('이 팝업 매장을 삭제할까요? (입력된 매출 기록은 남아 있습니다)')){await removePopupLocation(b.dataset.del);renderManage();toast('삭제되었습니다')}
+  });
+  // current login numbers
+  const ap=document.getElementById('adminPwIn'); if(ap)ap.value=adminPw;
+  const pc=document.getElementById('popupCodeIn'); if(pc)pc.value=popupCode;
+}
+async function onSetAdminPw(){
+  const pw=document.getElementById('adminPwIn').value.trim();
+  if(!/^\d{4,8}$/.test(pw)){toast('비밀번호는 숫자 4~8자리로 입력하세요');return}
+  const taken=allPins(); taken.delete(adminPw);
+  if(taken.has(pw)){toast('매장·팝업 번호와 겹칩니다. 다른 번호를 쓰세요');return}
+  const ok=await setAdminPw(pw);
+  toast(ok?'관리자 비밀번호가 변경되었습니다 ✓':'저장에 실패했습니다. 잠시 후 다시 시도해 주세요');
+}
+async function onSetPopupCode(){
+  const code=document.getElementById('popupCodeIn').value.trim();
+  if(!/^\d{4,8}$/.test(code)){toast('팝업 입장번호는 숫자 4~8자리로 입력하세요');return}
+  const taken=allPins(); taken.delete(popupCode);
+  if(taken.has(code)){toast('관리자·매장 번호와 겹칩니다. 다른 번호를 쓰세요');return}
+  const ok=await setPopupCode(code);
+  toast(ok?'팝업 매장 입장번호가 변경되었습니다 ✓':'저장에 실패했습니다. 잠시 후 다시 시도해 주세요');
+}
+async function onAddStore(){
+  const name=document.getElementById('newStoreName').value.trim();
+  const pin=document.getElementById('newStorePin').value.trim();
+  if(!name){toast('매장명을 입력하세요');return}
+  if(!/^\d{4,8}$/.test(pin)){toast('입장번호는 숫자 4~8자리로 입력하세요');return}
+  if(allPins().has(pin)){toast('이미 사용 중인 번호입니다. 다른 번호를 쓰세요');return}
+  await addStore(name,pin);
+  document.getElementById('newStoreName').value='';
+  document.getElementById('newStorePin').value='';
+  renderManage(); toast(`'${name}' 매장이 추가되었습니다 ✓ (입장번호 ${pin})`);
+}
+async function onAddPopupM(){
+  const name=document.getElementById('newPopupName').value.trim();
+  const start=document.getElementById('newPopupStart').value;
+  const end=document.getElementById('newPopupEnd').value;
+  if(!name){toast('팝업 매장명을 입력하세요');return}
+  if(start&&end&&end<start){toast('종료일이 시작일보다 빠릅니다');return}
+  await addPopupLocation(name,start,end);
+  document.getElementById('newPopupName').value='';
+  document.getElementById('newPopupStart').value='';
+  document.getElementById('newPopupEnd').value='';
+  renderManage(); toast(`'${name}' 팝업이 추가되었습니다 ✓`);
+}
+
+/* ===== 과거 매출 일괄 업로드 ===== */
+function pickSheet(wb,names){
+  for(const n of names)if(wb.Sheets[n])return wb.Sheets[n];
+  const keys=wb.SheetNames;
+  for(const n of names){const k=keys.find(x=>x.replace(/\s/g,'')===n);if(k)return wb.Sheets[k]}
+  for(const n of names){const k=keys.find(x=>x.includes(n));if(k)return wb.Sheets[k]}
+  return null;
+}
+function field(row,names){for(const k in row){if(names.includes(String(k).trim()))return row[k]}return ''}
+function xlDate(v){
+  if(v==null||v==='')return null;
+  if(v instanceof Date)return ymd(v);
+  if(typeof v==='number'){const d=new Date(Math.round((v-25569)*86400*1000));return isNaN(d)?null:`${d.getUTCFullYear()}-${pad(d.getUTCMonth()+1)}-${pad(d.getUTCDate())}`}
+  let s=String(v).trim().replace(/\./g,'-').replace(/\//g,'-').replace(/\s/g,'').replace(/-+$/,'');
+  const parts=s.split('-').filter(Boolean);
+  if(parts.length===3){const y=+parts[0],m=+parts[1],d=+parts[2];if(y>1900&&m>=1&&m<=12&&d>=1&&d<=31)return `${y}-${pad(m)}-${pad(d)}`}
+  if(parts.length===2){const now=new Date();const m=+parts[0],d=+parts[1];if(m>=1&&m<=12)return `${now.getFullYear()}-${pad(m)}-${pad(d)}`}
+  const dd=new Date(v);return isNaN(dd)?null:ymd(dd);
+}
+function findStoreIdByName(name){
+  name=String(name).trim();
+  for(const id of ORDER)if(STORES[id].name===name)return id;
+  for(const id of ORDER)if(STORES[id].code===name)return id;
+  return null;
+}
+function findPopupIdByName(name){name=String(name).trim();const p=popupList.find(x=>x.name===name);return p?p.id:null}
+
+function downloadTemplate(){
+  if(typeof XLSX==='undefined'){toast('엑셀 모듈 로드 실패');return}
+  const wb=XLSX.utils.book_new();
+  const direct=[['날짜','매장','포토','캡슐','상품','객단가','코멘트','인기상품']];
+  const popup=[['날짜','팝업매장','팝업매출','객단가','코멘트','인기상품']];
+  const guide=[
+    ['[작성 안내]'],
+    ['1) 날짜는 YYYY-MM-DD 형식으로 입력 (예: 2026-06-14)'],
+    ['2) 매장명/팝업매장명은 아래 목록과 정확히 같게 입력하세요'],
+    ['3) 금액은 숫자만(원 단위). 포토/캡슐/상품이 없으면 비워두고, 필요시 총매출 열을 추가해도 됩니다'],
+    ['4) 같은 날짜·매장을 다시 업로드하면 덮어쓰기됩니다 (중복 합산 안 됨)'],
+    [''],
+    ['── 사용 가능한 직영 매장명 ──'],
+    ...ORDER.map(id=>[STORES[id].name]),
+    [''],
+    ['── 사용 가능한 팝업 매장명 ──'],
+    ...popupList.map(p=>[p.name]),
+  ];
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(direct),'직영_일별');
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(popup),'팝업_일별');
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(guide),'안내');
+  XLSX.writeFile(wb,'PITB_매출업로드_양식.xlsx');
+  toast('양식을 내려받았습니다 ✓');
+}
+async function importExcel(file){
+  if(typeof XLSX==='undefined'){toast('엑셀 모듈 로드 실패');return}
+  const res=document.getElementById('importResult'); res.textContent='파일 읽는 중…';
+  try{
+    const buf=await file.arrayBuffer();
+    const wb=XLSX.read(buf,{type:'array',cellDates:true});
+    await loadStores(); await getPopups();
+    const dSheet=pickSheet(wb,['직영_일별','직영']);
+    const pSheet=pickSheet(wb,['팝업_일별','팝업']);
+    const dRows=dSheet?XLSX.utils.sheet_to_json(dSheet,{raw:true,defval:''}):[];
+    const pRows=pSheet?XLSX.utils.sheet_to_json(pSheet,{raw:true,defval:''}):[];
+    const total=dRows.length+pRows.length;
+    if(!total){res.textContent='읽을 데이터가 없습니다. 양식의 직영_일별 / 팝업_일별 시트를 확인하세요.';return}
+    res.textContent='데이터 계산 중…';
+    let okD=0,okP=0,skip=0; const unmatched=new Set();
+    const patch={}, patchMem={};
+    const overlay=(k)=>{if(k in patchMem)try{return JSON.parse(patchMem[k])}catch(e){return null}return null};
+    const cur=async(k)=>overlay(k)||(await rGet(k));
+    const stage=(k,v)=>{const s=JSON.stringify(v);patchMem[k]=s;if(!String(k).startsWith('photo:'))patch[k]=s};
+    for(const row of dRows){
+      const date=xlDate(field(row,['날짜','date']));
+      const nm=String(field(row,['매장','store'])||'').trim();
+      const sid=findStoreIdByName(nm);
+      if(!date||!sid){skip++;if(nm&&!sid)unmatched.add(nm);continue}
+      let photo=num(field(row,['포토'])),capsule=num(field(row,['캡슐'])),product=num(field(row,['상품']));
+      if(photo+capsule+product===0){const tot=num(field(row,['총매출','매출']));if(tot>0)product=tot}
+      if(photo+capsule+product<=0){skip++;continue}
+      const data={photo,capsule,product,atv:num(field(row,['객단가'])),memo:String(field(row,['코멘트'])||'').trim(),hits:String(field(row,['인기상품'])||'').trim()};
+      const prev=(await cur(repKey(date,sid)))||blankAgg();
+      const camp=(await cur(aggKey(sid)))||blankAgg();
+      const wk=(await cur(wKey(date,sid)))||blankAgg();
+      const mo=(await cur(mKey(date,sid)))||blankAgg();
+      stage(aggKey(sid),applyDelta(camp,data,prev));
+      stage(wKey(date,sid),applyDelta(wk,data,prev));
+      stage(mKey(date,sid),applyDelta(mo,data,prev));
+      stage(repKey(date,sid),{...data,ts:Date.now()});
+      okD++;
+    }
+    for(const row of pRows){
+      const date=xlDate(field(row,['날짜','date']));
+      const nm=String(field(row,['팝업매장','매장'])||'').trim();
+      if(!date||!nm){skip++;continue}
+      let pid=findPopupIdByName(nm);
+      if(!pid){await addPopupLocation(nm);pid=popupList[popupList.length-1].id}
+      const sales=num(field(row,['팝업매출','매출']));
+      if(sales<=0){skip++;continue}
+      const data={sales,atv:num(field(row,['객단가'])),memo:String(field(row,['코멘트'])||'').trim(),hits:String(field(row,['인기상품'])||'').trim()};
+      const prev=(await cur(repKey(date,pCode(pid))))||{sales:0};
+      const camp=(await cur(aggKey(pCode(pid))))||{sales:0};
+      const wk=(await cur(wKey(date,pCode(pid))))||{sales:0};
+      const mo=(await cur(mKey(date,pCode(pid))))||{sales:0};
+      const d=(data.sales||0)-(prev.sales||0);
+      stage(aggKey(pCode(pid)),{...camp,sales:(camp.sales||0)+d});
+      stage(wKey(date,pCode(pid)),{...wk,sales:(wk.sales||0)+d});
+      stage(mKey(date,pCode(pid)),{...mo,sales:(mo.sales||0)+d});
+      stage(repKey(date,pCode(pid)),{...data,ts:Date.now()});
+      okP++;
+    }
+    Object.assign(MEM,patchMem);
+    const items=Object.entries(patch).map(([key,value])=>({key,value}));
+    if(items.length>0&&apiReady()){
+      const CHUNK=100;
+      for(let i=0;i<items.length;i+=CHUNK){
+        await apiPost({action:'setMany',items:items.slice(i,i+CHUNK)});
+        res.textContent=`서버에 전송 중… ${Math.min(i+CHUNK,items.length)}/${items.length}`;
+      }
+    }
+    let msg=`완료 ✓ 직영 ${okD}건, 팝업 ${okP}건 등록`;
+    if(skip)msg+=` · 건너뜀 ${skip}건`;
+    if(unmatched.size)msg+=`
+⚠ 매칭 안 된 직영 매장명: ${[...unmatched].join(', ')}
+→ '정규 매장'에 먼저 추가한 뒤 다시 업로드하세요.`;
+    res.innerHTML=esc(msg).replace(/\n/g,'<br>');
+    renderManage();
+    toast('업로드 완료 ✓');
+  }catch(e){console.error(e);res.textContent='업로드 실패: '+(e.message||e)}
+}
+function renderAdminStrip(){
+  const strip=document.getElementById('adminStrip');
+  const days=[]; let d=selDateAdmin;
+  // 선택일 기준 앞뒤 7일씩 표시
+  for(let i=7;i>=1;i--){const dd=parseD(selDateAdmin);dd.setDate(dd.getDate()-i);days.push(ymd(dd))}
+  days.push(selDateAdmin);
+  for(let i=1;i<=7;i++){const dd=parseD(selDateAdmin);dd.setDate(dd.getDate()+i);days.push(ymd(dd))}
+  days.sort();
+  strip.innerHTML=days.map(dt=>{
+    const dd=parseD(dt),wd=dd.getDay();
+    const cls=['dchip'];
+    if(dt===selDateAdmin)cls.push('on');
+    if(dt===today())cls.push('has');
+    if(wd===6)cls.push('sat'); if(wd===0)cls.push('sun');
+    const label=dt===today()?'오늘':DOW[wd];
+    return `<div class="${cls.join(' ')}" data-d="${dt}"><div class="dd">${dd.getMonth()+1}/${dd.getDate()}</div><div class="dw">${label}</div></div>`;
+  }).join('');
+  strip.querySelectorAll('.dchip').forEach(el=>el.onclick=()=>{selDateAdmin=el.dataset.d;openAdmin()});
+  const onEl=strip.querySelector('.dchip.on'); if(onEl)onEl.scrollIntoView({inline:'center',block:'nearest'});
+}
+document.getElementById('adminPick').addEventListener('change',e=>{if(e.target.value){selDateAdmin=e.target.value;openAdmin()}});
+let adminSummaryText='';
+let adminLY={dayD:0,dayP:0,week:0,month:0};
+async function computeAdminLastYear(){
+  const D=selDateAdmin; const lyD=lastYearSameDOW(D); const lyMbase=lastYearMonthId(D)+'-01';
+  const sumD=a=>a?((a.photo||0)+(a.capsule||0)+(a.product||0)):0;
+  let dayD=0,week=0,month=0;
+  for(const code of ORDER){
+    dayD+=sumD(await getReport(lyD,code));
+    week+=sumD(await rGet(wKey(lyD,code)));
+    month+=sumD(await rGet(mKey(lyMbase,code)));
+  }
+  let dayP=0;
+  const pl=(popupList&&popupList.length)?popupList:await getPopups();
+  for(const p of pl){const r=await getPopupReport(lyD,p.id);dayP+=r?(r.sales||0):0}
+  adminLY={dayD,dayP,week,month};
+}
+async function loadAdmin(){
+  await loadAll();
+  const D=selDateAdmin;
+  // ----- direct stores -----
+  let done=0,total=0,weekTot=0,monthTot=0; const rows=[];
+  const sumA=a=>(a.photo||0)+(a.capsule||0)+(a.product||0);
+  // 선택일 기준 주간/월간 범위 계산
+  const wStart=weekId(D); // 해당 주 월요일
+  const wEnd=ymd((()=>{const d=parseD(wStart);d.setDate(d.getDate()+6);return d})());
+  const mStart=D.slice(0,7)+'-01';
+  const mEnd=D; // 선택일까지만 (과거 날짜 선택 시 그 날까지)
+
+  for(const code of ORDER){
+    const s=STORES[code];
+    const r=await getReport(D,code);
+    const y=await getReport(prevDay(D),code);
+
+    // 주간: 해당 주 월~선택일까지 일별 합산
+    let wkS=0;
+    for(let d=wStart;d<=D;d=ymd((()=>{const dd=parseD(d);dd.setDate(dd.getDate()+1);return dd})())){
+      const dr=await getReport(d,code); if(dr)wkS+=sumA(dr);
+    }
+    // 월간: 해당 월 1일~선택일까지 일별 합산
+    let moS=0;
+    for(let d=mStart;d<=D;d=ymd((()=>{const dd=parseD(d);dd.setDate(dd.getDate()+1);return dd})())){
+      const dr=await getReport(d,code); if(dr)moS+=sumA(dr);
+    }
+    // 연간: 당해년도 1/1~선택일까지
+    const yr=parseD(D).getFullYear(); const selM=parseD(D).getMonth()+1;
+    let yearTot=moS;
+    for(let m=1;m<selM;m++){
+      const ma=(await rGet(`agg:m:${yr}-${pad(m)}:${code}`))||blankAgg();
+      yearTot+=sumA(ma);
+    }
+    if(r){done++;total+=sumA(r)}
+    weekTot+=wkS; monthTot+=moS;
+    rows.push({code,s,r,y,wkS,moS,yearTot});
+  }
+  // ----- popup locations -----
+  const popups=await getPopups();
+  let pDone=0,pToday=0,pWeek=0,pMonth=0; const pRows=[];
+  let pActive=0;
+  for(const p of popups){
+    const st=popupStatus(p,D);
+    const isActive=(st.cls==='st-live');
+    const r=await getPopupReport(D,p.id);
+    const y=await getPopupReport(prevDay(D),p.id);
+    // 주간: 월~선택일까지 일별 합산
+    let wkS=0;
+    for(let d=wStart;d<=D;d=ymd((()=>{const dd=parseD(d);dd.setDate(dd.getDate()+1);return dd})())){
+      const dr=await getPopupReport(d,p.id); if(dr)wkS+=(dr.sales||0);
+    }
+    // 월간: 1일~선택일까지 일별 합산
+    let moS=0;
+    for(let d=mStart;d<=D;d=ymd((()=>{const dd=parseD(d);dd.setDate(dd.getDate()+1);return dd})())){
+      const dr=await getPopupReport(d,p.id); if(dr)moS+=(dr.sales||0);
+    }
+    // 연간
+    const yr=parseD(D).getFullYear(); const selM=parseD(D).getMonth()+1;
+    let yearTot=moS;
+    for(let m=1;m<selM;m++){
+      const ma=(await rGet(`agg:m:${yr}-${pad(m)}:${pCode(p.id)}`))||{sales:0};
+      yearTot+=(ma.sales||0);
+    }
+    if(isActive){pActive++;if(r){pDone++;pToday+=(r.sales||0)}}
+    else if(r){pToday+=(r.sales||0)}
+    pWeek+=wkS; pMonth+=moS;
+    pRows.push({p,r,y,wkS,moS,yearTot});
+  }
+
+  document.getElementById('sumDone').textContent=(done+pDone)+' / '+(ORDER.length+pActive);
+  document.getElementById('sumTotal').innerHTML=won(total).replace('원','')+'<small>원</small>';
+  document.getElementById('sumPopup').innerHTML=won(pToday).replace('원','')+'<small>원</small>';
+  document.getElementById('sumPopupMonth').innerHTML=won(pMonth).replace('원','')+'<small>원</small>';
+  document.getElementById('sumMonth').innerHTML=won(monthTot).replace('원','')+'<small>원</small>';
+  // 연간 합계: 1~(선택월-1)은 agg:m 집계키, 선택월은 이미 계산된 monthTot 사용
+  const yr=parseD(D).getFullYear();
+  const selM=parseD(D).getMonth()+1;
+  let yearTotAll=monthTot; // 선택월 누계
+  for(let m=1;m<selM;m++){
+    for(const code of ORDER){
+      const ma=(await rGet(`agg:m:${yr}-${pad(m)}:${code}`))||blankAgg();
+      yearTotAll+=(ma.photo||0)+(ma.capsule||0)+(ma.product||0);
+    }
+  }
+  document.getElementById('sumYear').innerHTML=won(yearTotAll).replace('원','')+'<small>원</small>';
+  document.getElementById('sumYearYoY').innerHTML='';
+
+  // 팝업 연간: pRows의 yearTot 합산
+  const popupYearAll=pRows.reduce((a,x)=>a+(x.yearTot||0),0);
+  document.getElementById('sumPopupYear').innerHTML=won(popupYearAll).replace('원','')+'<small>원</small>';
+
+  // B2B 연간: b2b:{yr}- 프리픽스 키 전체 합산
+  let b2bYearAll=0;
+  try{
+    const bl=await rList('b2b:'+yr+'-');
+    for(const k of (bl.keys||[])){
+      const entries=await rGet(k);
+      if(Array.isArray(entries))b2bYearAll+=entries.reduce((a,e)=>a+(e.amt||0),0);
+    }
+  }catch(e){}
+  document.getElementById('sumB2BYear').innerHTML=won(b2bYearAll).replace('원','')+'<small>원</small>';
+
+  document.getElementById('sumTotalYoY').innerHTML=yoyHtmlIf(total,adminLY.dayD);
+  document.getElementById('sumPopupYoY').innerHTML=yoyHtmlIf(pToday,adminLY.dayP);
+  document.getElementById('sumMonthYoY').innerHTML=yoyHtmlIf(monthTot,adminLY.month);
+  document.getElementById('adminDate').textContent=dateLabel(D);
+
+  // summary text for copy
+  adminSummaryText=`[PITB 전체 ${shortDate(D)}]\n`+
+    `직영 ${done}/${ORDER.length} 당일 ${won(total)} · 주간 ${won(weekTot)} · 월간 ${won(monthTot)}\n`+
+    `팝업 ${pDone}/${popups.length} 당일 ${won(pToday)} · 주간 ${won(pWeek)} · 월간 ${won(pMonth)}\n\n`+
+    `[직영]\n`+rows.map(({s,r})=>r?`· ${s.name}: ${won(r.photo+r.capsule+r.product)}`:`· ${s.name}: 미보고`).join('\n')+
+    `\n\n[팝업]\n`+pRows.map(({p,r})=>r?`· ${p.name}: ${won(r.sales)}`:`· ${p.name}: 미보고`).join('\n');
+
+  // ----- render: direct section -----
+  let html=`<div class="sec-h"><span class="sec-t">직영 매장</span><span class="sec-sub">${done}/${ORDER.length} · 당일 ${won(total)}</span></div>`;
+  html+=rows.map(({code,s,r,y,wkS,moS,yearTot})=>{
+    if(!r)return `<div class="store"><div class="store-h"><div class="store-n">${s.name}</div><span class="pill wait">대기</span></div><div class="cats" style="margin-top:7px">아직 보고하지 않았습니다</div><div class="cats"><span>주간 <b>${won(wkS)}</b></span><span>월간 <b>${won(moS)}</b></span><span>누적 <b>${won(yearTot)}</b></span></div></div>`;
+    const isHoliday=r.memo==='점휴'&&(r.photo+r.capsule+r.product)===0;
+    if(isHoliday)return `<div class="store"><div class="store-h"><div class="store-n">${s.name}</div><span class="pill" style="background:#FFF3E0;color:#E65100;border:1px solid #FFCC80">🚫 점휴</span></div><div class="cats"><span>주간 <b>${won(wkS)}</b></span><span>월간 <b>${won(moS)}</b></span><span>누적 <b>${won(yearTot)}</b></span></div></div>`;
+    const tot=r.photo+r.capsule+r.product;
+    const yTot=y?(y.photo+y.capsule+y.product):0;
+    let diff='';
+    if(yTot>0){const dd=Math.round((tot-yTot)/yTot*100);diff=`<span class="kv" style="font-size:12px;color:var(--ink-3)">전일 <b class="${dd>=0?'pos':'neg'}">${dd>=0?'+':''}${dd}%</b></span>`}
+    const hitsList=r.hits?r.hits.split('\n').map(x=>x.trim()).filter(Boolean):[];
+    return `<div class="store">
+      <div class="store-h"><div class="store-n">${s.name}</div><span class="pill done">완료</span><button class="btn-reset" data-code="${code}" data-type="direct" title="오입력 취소(0으로 초기화)">✕ 취소</button></div>
+      <div class="store-tot"><span class="big">${won(tot)}</span>${diff}</div>
+      <div class="cats"><span>포토 <b>${won(r.photo)}</b></span><span>캡슐 <b>${won(r.capsule)}</b></span><span>상품 <b>${won(r.product)}</b></span></div>
+      <div class="cats"><span>객단가 <b>${won(r.atv)}</b></span></div>
+      <div class="cats" style="border-top:1px dashed var(--line);padding-top:7px;margin-top:8px"><span>주간 <b>${won(wkS)}</b></span><span>월간 <b>${won(moS)}</b></span><span>누적 <b>${won(yearTot)}</b></span></div>
+      ${r.memo?`<div class="memo">💬 ${esc(r.memo)}</div>`:''}
+      ${hitsList.length?`<div class="hits">🔥 인기: <b>${hitsList.map(esc).join(' · ')}</b></div>`:''}
+    </div>`;
+  }).join('');
+
+  // ----- render: popup section -----
+  html+=`<div class="sec-h"><span class="sec-t">팝업 매장</span><span class="sec-sub">${pDone}/${popups.length} · 당일 ${won(pToday)} · 월간 ${won(pMonth)}</span></div>`;
+  // 운영중 팝업을 상단으로 정렬 (운영중 → 오픈예정 → 종료, 각 그룹 내 매출 큰 순)
+  const stOrder=c=>c==='st-live'?0:c==='st-soon'?1:2;
+  pRows.sort((a,b)=>{
+    const sa=stOrder(popupStatus(a.p,D).cls), sb=stOrder(popupStatus(b.p,D).cls);
+    if(sa!==sb)return sa-sb;
+    return (b.moS||0)-(a.moS||0);
+  });
+  html+=pRows.map(({p,r,y,wkS,moS,yearTot})=>{
+    const st=popupStatus(p,D);
+    const head=`<div class="store-h"><div class="store-n">${esc(p.name)} <span class="st ${st.cls}">${st.label}</span></div>`;
+    const period=`<div class="cats" style="color:var(--ink-3)">운영기간 ${popupPeriod(p)}</div>`;
+    if(!r)return `<div class="store">${head}<span class="pill wait">대기</span></div>${period}<div class="cats">아직 보고하지 않았습니다</div><div class="cats"><span>주간 <b>${won(wkS)}</b></span><span>월간 <b>${won(moS)}</b></span><span>누적 <b>${won(yearTot)}</b></span></div></div>`;
+    const yTot=y?(y.sales||0):0;
+    let diff='';
+    if(yTot>0){const dd=Math.round(((r.sales||0)-yTot)/yTot*100);diff=`<span class="kv" style="font-size:12px;color:var(--ink-3)">전일 <b class="${dd>=0?'pos':'neg'}">${dd>=0?'+':''}${dd}%</b></span>`}
+    const hitsList=r.hits?r.hits.split('\n').map(x=>x.trim()).filter(Boolean):[];
+    return `<div class="store">
+      ${head}<button class="btn-reset" data-code="${p.id}" data-type="popup" title="오입력 취소(0으로 초기화)">✕ 취소</button><span class="pill done">완료</span></div>
+      ${period}
+      <div class="store-tot"><span class="big">${won(r.sales)}</span>${diff}</div>
+      <div class="cats"><span>객단가 <b>${won(r.atv)}</b></span></div>
+      <div class="cats" style="border-top:1px dashed var(--line);padding-top:7px;margin-top:8px"><span>주간 <b>${won(wkS)}</b></span><span>월간 <b>${won(moS)}</b></span><span>누적 <b>${won(yearTot)}</b></span></div>
+      ${r.memo?`<div class="memo">💬 ${esc(r.memo)}</div>`:''}
+      ${hitsList.length?`<div class="hits">🔥 인기: <b>${hitsList.map(esc).join(' · ')}</b></div>`:''}
+    </div>`;
+  }).join('');
+
+  // ----- render: external channel section -----
+  const exts=await getExts();
+  let xDone=0,xToday=0,xWeekTot=0,xMonthTot=0,xYearAll=0; const xRows=[];
+  for(const p of exts){
+    const r=await getExtReport(D,p.id);
+    let wkS=0,moS=0;
+    for(let d=wStart;d<=D;d=ymd((()=>{const dd=parseD(d);dd.setDate(dd.getDate()+1);return dd})())){
+      const dr=await getExtReport(d,p.id); if(dr)wkS+=sumX(dr);
+    }
+    for(let d=mStart;d<=D;d=ymd((()=>{const dd=parseD(d);dd.setDate(dd.getDate()+1);return dd})())){
+      const dr=await getExtReport(d,p.id); if(dr)moS+=sumX(dr);
+    }
+    const yrX=parseD(D).getFullYear(); const selMX=parseD(D).getMonth()+1;
+    let yearTot=moS;
+    for(let m=1;m<selMX;m++){
+      const ma=(await rGet(`agg:m:${yrX}-${pad(m)}:${xCode(p.id)}`))||{photo:0,capsule:0};
+      yearTot+=sumX(ma);
+    }
+    if(r){xDone++;xToday+=sumX(r)}
+    xWeekTot+=wkS;xMonthTot+=moS;xYearAll+=yearTot;
+    xRows.push({p,r,wkS,moS,yearTot});
+  }
+  const _xOrd=c=>c==='st-live'?0:c==='st-soon'?1:2;
+  xRows.sort((a,b)=>{
+    const sa=_xOrd(popupStatus(a.p,D).cls),sb=_xOrd(popupStatus(b.p,D).cls);
+    if(sa!==sb)return sa-sb;
+    return (b.moS||0)-(a.moS||0);
+  });
+  document.getElementById('sumExtYear').innerHTML=won(xYearAll).replace('원','')+'<small>원</small>';
+  document.getElementById('sumExtMonth').innerHTML=won(xMonthTot).replace('원','')+'<small>원</small>';
+  html+=`<div class="sec-h"><span class="sec-t">외부채널 · 포토부스/캡슐토이</span><span class="sec-sub">${xDone}/${exts.length} · 당일 ${won(xToday)}</span></div>`;
+  html+=xRows.map(({p,r,wkS,moS,yearTot})=>{
+    const st=popupStatus(p,D);
+    const head=`<div class="store-h"><div class="store-n">${esc(p.name)} <span class="st ${st.cls}">${st.label}</span></div>`;
+    if(!r)return `<div class="store">${head}<span class="pill wait">대기</span></div><div class="cats">아직 보고하지 않았습니다</div><div class="cats" style="border-top:1px dashed var(--line);padding-top:7px;margin-top:8px"><span>주간 <b>${won(wkS)}</b></span><span>월간 <b>${won(moS)}</b></span><span>누적 <b>${won(yearTot)}</b></span></div></div>`;
+    return `<div class="store">
+      ${head}<span class="pill done">완료</span></div>
+      <div class="store-tot"><span class="big">${won(sumX(r))}</span></div>
+      <div class="cats"><span>포토부스 <b>${won(r.photo||0)}</b></span><span>캡슐토이 <b>${won(r.capsule||0)}</b></span></div>
+      <div class="cats" style="border-top:1px dashed var(--line);padding-top:7px;margin-top:8px"><span>주간 <b>${won(wkS)}</b></span><span>월간 <b>${won(moS)}</b></span><span>누적 <b>${won(yearTot)}</b></span></div>
+      ${r.memo?`<div class="memo">💬 ${esc(r.memo)}</div>`:''}
+    </div>`;
+  }).join('');
+
+  // ----- render: B2B section -----
+  // 당일 거래 + 주간/월간/연간 합계
+  let b2bDayEntries=[]; let b2bDayTot=0; let b2bWeekTot=0; let b2bMonthTot=0; let b2bYearTot=0;
+  try{
+    const bl=await rList('b2b:');
+    const yrStr=D.slice(0,4);
+    for(const k of (bl.keys||[])){
+      const parts=k.split(':'); if(parts.length<3)continue;
+      const kd=parts[1];
+      if(kd.slice(0,4)!==yrStr)continue;
+      if(kd>D)continue;
+      const entries=await rGet(k);
+      if(!Array.isArray(entries))continue;
+      const sum=entries.reduce((a,e)=>a+(e.amt||0),0);
+      b2bYearTot+=sum;
+      if(kd.slice(0,7)===D.slice(0,7))b2bMonthTot+=sum;
+      if(kd>=wStart&&kd<=D)b2bWeekTot+=sum;
+      if(kd===D){b2bDayEntries=b2bDayEntries.concat(entries.map(e=>({...e,_d:kd})));b2bDayTot+=sum;}
+    }
+  }catch(e){}
+  document.getElementById('sumB2BMonth').innerHTML=won(b2bMonthTot).replace('원','')+'<small>원</small>';
+  html+=`<div class="sec-h"><span class="sec-t">B2B</span><span class="sec-sub">당일 ${won(b2bDayTot)}</span></div>`;
+  if(b2bDayEntries.length===0){
+    html+=`<div class="store"><div class="cats" style="margin-top:2px">오늘 등록된 B2B 공급 거래가 없습니다</div><div class="cats" style="border-top:1px dashed var(--line);padding-top:7px;margin-top:8px"><span>주간 <b>${won(b2bWeekTot)}</b></span><span>월간 <b>${won(b2bMonthTot)}</b></span><span>누적 <b>${won(b2bYearTot)}</b></span></div></div>`;
+  } else {
+    html+=`<div class="store">`;
+    html+=b2bDayEntries.map(e=>`
+      <div class="store-h" style="margin-bottom:4px"><div class="store-n" style="font-size:14px">${esc(e.co)}</div><span style="font-size:14px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--brand)">${won(e.amt||0)}</span></div>
+      ${e.memo?`<div class="cats" style="margin-top:0;margin-bottom:6px">${esc(e.memo)}</div>`:''}`).join('');
+    html+=`<div class="cats" style="border-top:1px dashed var(--line);padding-top:7px;margin-top:8px"><span>주간 <b>${won(b2bWeekTot)}</b></span><span>월간 <b>${won(b2bMonthTot)}</b></span><span>누적 <b>${won(b2bYearTot)}</b></span></div>`;
+    html+=`</div>`;
+  }
+
+  document.getElementById('storeList').innerHTML=html;
+
+  // 오입력 취소 버튼 이벤트
+  document.getElementById('storeList').querySelectorAll('.btn-reset').forEach(btn=>{
+    btn.onclick=async()=>{
+      const code=btn.dataset.code; const type=btn.dataset.type;
+      const name=type==='direct'?STORES[code]?.name:(popupList.find(p=>p.id===code)?.name||code);
+      if(!confirm(`${D} ${name}\n이 날짜 매출을 0으로 초기화할까요?\n(오입력 취소)`))return;
+      btn.disabled=true; btn.textContent='처리 중…';
+      if(type==='direct'){
+        await saveReport(code,{photo:0,capsule:0,product:0,atv:0,memo:'오입력취소',hits:''},D);
+      } else {
+        await savePopup(code,{sales:0,atv:0,memo:'오입력취소',hits:''},D);
+      }
+      toast(`${name} ${D} 매출이 0으로 초기화됐습니다 ✓`);
+      await loadAdmin();
+    };
+  });
+
+  const t=new Date();document.getElementById('lastSync').textContent=`${pad(t.getHours())}:${pad(t.getMinutes())}:${pad(t.getSeconds())}`;
+}
+
+/* copy */
+async function copyText(text,msg){
+  const ok=msg||'복사되었습니다 ✓ 카톡에 붙여넣으세요';
+  try{await navigator.clipboard.writeText(text);toast(ok);return}catch(e){}
+  try{const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);toast(ok)}
+  catch(e){toast('복사 실패 — 길게 눌러 직접 복사하세요')}
+}
+
+/* util */
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));document.getElementById(id).classList.add('on');window.scrollTo(0,0)}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+let toastTimer=null;
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');if(toastTimer)clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2600)}
+
+(async()=>{
+  try{await loadAll();}catch(e){}
+  try{await loadStores();const h=document.getElementById('hintPopup');if(h)h.textContent=popupCode;}catch(e){}
+  if(!BACKEND_OK){const b=document.getElementById('noSaveBanner');if(b)b.style.display='block';}
+})();
+
+
+/* ═══════════════════════════════════════
+   B2B 공급 매출 (업체 거래 · 관리자 전용)
+═══════════════════════════════════════ */
+// B2B 데이터 키
+function b2bKey(date, code){ return `b2b:${date}:${code}`; }
+
+
+/* B2B 합계 조회 (관리자·리포트용) */
+async function getB2BTotal(date, code){
+  const entries = await rGet(b2bKey(date, code));
+  if(!entries || !Array.isArray(entries)) return 0;
+  return entries.reduce((a, e) => a + (e.amt || 0), 0);
+}
+async function getB2BEntries(date, code){
+  const entries = await rGet(b2bKey(date, code));
+  return Array.isArray(entries) ? entries : [];
+}
+
+/* ═══ 외부채널 허브 ═══ */
+let selExt='ALL'; let selDateExt=today();
+async function openExtHub(){
+  show('s-ext');
+  await getExts();
+  if(selExt!=='ALL' && !extList.find(p=>p.id===selExt)) selExt='ALL';
+  renderExtTabs();
+  await routeExt();
+  document.getElementById('addExtBtn').onclick=async()=>{
+    const name=prompt('추가할 외부채널 지점명을 입력하세요 (예: 메가박스 목동)');
+    if(name&&name.trim()){await addExtLocation(name.trim());selExt=extList[extList.length-1].id;renderExtTabs();await routeExt();toast('추가되었습니다 ✓')}
+  };
+  document.getElementById('extPick').onchange=async function(){
+    if(this.value){selDateExt=this.value;await renderExtStrip();await routeExt()}
+  };
+}
+function renderExtTabs(){
+  const wrap=document.getElementById('extTabs');
+  let tabs=`<div class="ptab${selExt==='ALL'?' on':''}" data-id="ALL">합계</div>`;
+  const _o=c=>c==='st-live'?0:c==='st-soon'?1:2;
+  const sorted=[...extList].sort((a,b)=>_o(popupStatus(a,selDateExt).cls)-_o(popupStatus(b,selDateExt).cls));
+  tabs+=sorted.map(p=>`<div class="ptab${p.id===selExt?' on':''}" data-id="${p.id}">${esc(p.name)}</div>`).join('');
+  wrap.innerHTML=tabs;
+  wrap.querySelectorAll('.ptab').forEach(el=>el.onclick=()=>{selExt=el.dataset.id;renderExtTabs();routeExt()});
+}
+async function routeExt(){
+  renderExtSchedule();
+  await renderExtStrip();
+  document.getElementById('extDate').textContent=dateLabel(selDateExt);
+  if(selExt==='ALL'){
+    document.getElementById('extEntry').style.display='none';
+    document.getElementById('extSummary').style.display='block';
+    await openExtSummary();
+  } else {
+    document.getElementById('extSummary').style.display='none';
+    document.getElementById('extEntry').style.display='block';
+    await openExtReport();
+  }
+}
+function renderExtSchedule(){
+  const el=document.getElementById('extSchedule');
+  if(selExt==='ALL'){
+    const live=extList.filter(p=>popupStatus(p,selDateExt).cls==='st-live').length;
+    el.innerHTML=`<span class="st st-live">운영중 ${live}곳</span> <span style="color:var(--ink-3)">전체 ${extList.length}개 지점</span>`;
+    return;
+  }
+  const p=extList.find(x=>x.id===selExt); if(!p){el.innerHTML='';return}
+  const s=popupStatus(p,selDateExt);
+  el.innerHTML=`<span class="st ${s.cls}">${s.label}</span> <span>운영기간 ${popupPeriod(p)}</span>`;
+}
+async function renderExtStrip(){
+  const wrap=document.getElementById('extStrip'); if(!wrap)return;
+  const days=[]; const base=parseD(selDateExt);
+  for(let i=-13;i<=0;i++){const d=new Date(base);d.setDate(d.getDate()+i);days.push(ymd(d))}
+  wrap.innerHTML=days.map(d=>{
+    const dd=parseD(d);const wnames=['일','월','화','수','목','금','토'];
+    const isSel=d===selDateExt;const isToday=d===today();
+    return `<div class="dchip${isSel?' on':''}" data-d="${d}"><div class="dc-d">${dd.getMonth()+1}/${dd.getDate()}</div><div class="dc-w">${isToday?'오늘':wnames[dd.getDay()]}</div></div>`;
+  }).join('');
+  wrap.querySelectorAll('.dchip').forEach(el=>el.onclick=async()=>{selDateExt=el.dataset.d;await routeExt()});
+  const sel=wrap.querySelector('.dchip.on'); if(sel)sel.scrollIntoView({inline:'end',block:'nearest'});
+}
+async function openExtReport(){
+  const r=await getExtReport(selDateExt,selExt)||{photo:0,capsule:0,memo:''};
+  document.getElementById('inXPhoto').value=r.photo?r.photo.toLocaleString('ko-KR'):'';
+  document.getElementById('inXCapsule').value=r.capsule?r.capsule.toLocaleString('ko-KR'):'';
+  document.getElementById('inXMemo').value=r.memo||'';
+  await refreshExt();
+  document.getElementById('xSaveBtn').onclick=async()=>{
+    const data={photo:num(document.getElementById('inXPhoto').value),capsule:num(document.getElementById('inXCapsule').value),memo:document.getElementById('inXMemo').value.trim()};
+    const btn=document.getElementById('xSaveBtn');btn.disabled=true;btn.textContent='저장 중…';
+    await saveExt(selExt,data,selDateExt);
+    btn.disabled=false;btn.textContent='보고 저장 · 공유';
+    toast('저장되었습니다 ✓');
+    await refreshExt();
+  };
+}
+async function refreshExt(){
+  const D=selDateExt;
+  const r=await getExtReport(D,selExt)||{photo:0,capsule:0};
+  const cur=num(document.getElementById('inXPhoto').value)+num(document.getElementById('inXCapsule').value);
+  document.getElementById('xToday').innerHTML=won(cur||sumX(r)).replace('원','')+'<small>원</small>';
+  // 주간/월간
+  const wS=weekId(D);let wk=0,mo=0;
+  const mSt=D.slice(0,8)+'01';
+  for(let d=wS;d<=D;d=ymd((()=>{const dd=parseD(d);dd.setDate(dd.getDate()+1);return dd})())){
+    const dr=await getExtReport(d,selExt); if(dr)wk+=sumX(dr);
+  }
+  for(let d=mSt;d<=D;d=ymd((()=>{const dd=parseD(d);dd.setDate(dd.getDate()+1);return dd})())){
+    const dr=await getExtReport(d,selExt); if(dr)mo+=sumX(dr);
+  }
+  document.getElementById('xWeek').innerHTML=won(wk).replace('원','')+'<small>원</small>';
+  document.getElementById('xMonth').innerHTML=won(mo).replace('원','')+'<small>원</small>';
+  // 누적(연간)
+  const yr=parseD(D).getFullYear(); const selM=parseD(D).getMonth()+1;
+  let yTot=mo;
+  for(let m=1;m<selM;m++){
+    const ma=(await rGet(`agg:m:${yr}-${pad(m)}:${xCode(selExt)}`))||{photo:0,capsule:0};
+    yTot+=sumX(ma);
+  }
+  document.getElementById('extSub').textContent='누적 '+won(yTot);
+}
+async function openExtSummary(){
+  const D=selDateExt;
+  let dTot=0,wTot=0,mTot=0,yTotAll=0;
+  const rows=[];
+  const wS=weekId(D); const mSt=D.slice(0,8)+'01';
+  for(const p of extList){
+    const r=await getExtReport(D,p.id);
+    let wk=0,mo=0;
+    for(let d=wS;d<=D;d=ymd((()=>{const dd=parseD(d);dd.setDate(dd.getDate()+1);return dd})())){
+      const dr=await getExtReport(d,p.id); if(dr)wk+=sumX(dr);
+    }
+    for(let d=mSt;d<=D;d=ymd((()=>{const dd=parseD(d);dd.setDate(dd.getDate()+1);return dd})())){
+      const dr=await getExtReport(d,p.id); if(dr)mo+=sumX(dr);
+    }
+    const yr=parseD(D).getFullYear(); const selM=parseD(D).getMonth()+1;
+    let yTot=mo;
+    for(let m=1;m<selM;m++){
+      const ma=(await rGet(`agg:m:${yr}-${pad(m)}:${xCode(p.id)}`))||{photo:0,capsule:0};
+      yTot+=sumX(ma);
+    }
+    if(r)dTot+=sumX(r);
+    wTot+=wk;mTot+=mo;yTotAll+=yTot;
+    rows.push({p,r,wk,mo,yTot});
+  }
+  document.getElementById('xaToday').innerHTML=won(dTot).replace('원','')+'<small>원</small>';
+  document.getElementById('xaWeek').innerHTML=won(wTot).replace('원','')+'<small>원</small>';
+  document.getElementById('xaMonth').innerHTML=won(mTot).replace('원','')+'<small>원</small>';
+  document.getElementById('xaSub').textContent='외부채널 누적 합계 '+won(yTotAll);
+  document.getElementById('xaBreakdown').innerHTML=rows.map(({p,r,wk,mo,yTot})=>{
+    const st=popupStatus(p,D);
+    return `<div class="mrow">
+      <span class="mn">${esc(p.name)} <span class="st ${st.cls}">${st.label}</span></span>
+      <span style="font-weight:800;font-variant-numeric:tabular-nums">${r?won(sumX(r)):'—'}</span>
+    </div>
+    <div class="mrow" style="border-top:none;padding-top:0;font-size:12px;color:var(--ink-3)">
+      <span>주간 ${won(wk)} · 월간 ${won(mo)} · 누적 ${won(yTot)}</span>
+    </div>`;
+  }).join('')||'<div class="ph-empty">등록된 지점이 없습니다</div>';
+}
+
+
+
+/* ── 관리자: 외부채널 관리 ── */
+function renderManageExts(){
+  const el=document.getElementById('manageExts');
+  if(!el)return;
+  const _o=c=>c==='st-live'?0:c==='st-soon'?1:2;
+  const sorted=[...extList].sort((a,b)=>_o(popupStatus(a,today()).cls)-_o(popupStatus(b,today()).cls));
+  el.innerHTML=sorted.map(p=>{
+    const st=popupStatus(p,today());
+    return `<div class="mrow">
+      <span class="mn">${esc(p.name)} <span class="st ${st.cls}">${st.label}</span></span>
+      <input type="date" value="${p.start||''}" data-xid="${p.id}" data-f="start" title="시작일">
+      <input type="date" value="${p.end||''}" data-xid="${p.id}" data-f="end" title="종료일">
+      <button class="mdel" data-xdel="${p.id}">삭제</button>
+    </div>`;
+  }).join('')||'<div class="ph-empty">등록된 외부채널 지점이 없습니다.</div>';
+  el.querySelectorAll('input[data-xid]').forEach(inp=>inp.onchange=async()=>{
+    await updateExtLocation(inp.dataset.xid,{[inp.dataset.f]:inp.value});
+    renderManageExts(); toast('운영일정이 저장되었습니다 ✓');
+  });
+  el.querySelectorAll('[data-xdel]').forEach(b=>b.onclick=async()=>{
+    if(confirm('이 외부채널 지점을 삭제할까요? (입력된 매출 기록은 남아 있습니다)')){await removeExtLocation(b.dataset.xdel);renderManageExts();toast('삭제되었습니다')}
+  });
+}
+async function onAddExtM(){
+  const name=document.getElementById('newExtName').value.trim();
+  const start=document.getElementById('newExtStart').value;
+  const end=document.getElementById('newExtEnd').value;
+  if(!name){toast('지점명을 입력하세요');return}
+  await addExtLocation(name,start,end);
+  document.getElementById('newExtName').value='';
+  document.getElementById('newExtStart').value='';
+  document.getElementById('newExtEnd').value='';
+  renderManageExts(); toast('추가되었습니다 ✓');
+}
+async function onSetExtCode(){
+  const v=document.getElementById('extCodeIn').value.trim();
+  if(!/^[0-9]{4,8}$/.test(v)){toast('숫자 4~8자리로 입력하세요');return}
+  authCfg.extCode=v; const ok=await saveAuth(); extCode=v;
+  if(ok===false){toast('저장 실패');return}
+  document.getElementById('extCodeIn').value='';
+  toast('외부채널 입장번호가 변경되었습니다 ✓');
+}
+
+/* ── 관리자: B2B 매출 관리 ── */
+async function renderManageB2B(){
+  const el=document.getElementById('manageB2B');
+  if(!el)return;
+  // 최근 30일 b2b 키 스캔
+  const rows=[];
+  try{
+    const bl=await rList('b2b:');
+    const cutoff=(()=>{const d=new Date();d.setDate(d.getDate()-30);return ymd(d)})();
+    for(const k of (bl.keys||[])){
+      const parts=k.split(':'); // b2b:date:code
+      if(parts.length<3)continue;
+      const date=parts[1], code=parts[2];
+      if(date<cutoff)continue;
+      const entries=await rGet(k);
+      if(!Array.isArray(entries))continue;
+      entries.forEach(e=>rows.push({date,code,e}));
+    }
+  }catch(err){}
+  rows.sort((a,b)=>b.date.localeCompare(a.date)||((b.e.id||0)-(a.e.id||0)));
+
+  if(rows.length===0){
+    el.innerHTML='<div class="ph-empty">최근 30일 B2B 공급 거래가 없습니다</div>';
+    return;
+  }
+  el.innerHTML=rows.map(({date,code,e})=>`
+    <div class="mrow">
+      <div style="flex:1;min-width:140px">
+        <div class="mn" style="min-width:0">${esc(e.co)}</div>
+        <div class="mc">${shortDate(date)}${e.memo?' · '+esc(e.memo):''}</div>
+      </div>
+      <div style="font-size:14px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--brand)">${won(e.amt||0)}</div>
+      <button class="mdel" data-b2bdel="${date}|${code}|${e.id}">삭제</button>
+    </div>`).join('');
+
+  el.querySelectorAll('[data-b2bdel]').forEach(b=>b.onclick=async()=>{
+    const [date,code,id]=b.dataset.b2bdel.split('|');
+    if(!confirm('이 B2B 거래를 삭제할까요?'))return;
+    const key=b2bKey(date,code);
+    let entries=(await rGet(key))||[];
+    entries=entries.filter(e=>String(e.id)!==String(id));
+    await rSet(key,entries);
+    toast('삭제되었습니다');
+    renderManageB2B();
+  });
+}
+
+async function onAddB2BM(){
+  const code='HQ'; // 업체 공급 거래 — 매장 무관
+  const date=document.getElementById('newB2BDate').value||today();
+  const co  =document.getElementById('newB2BCo').value.trim();
+  const amt =num(document.getElementById('newB2BAmt').value);
+  const memo=document.getElementById('newB2BMemo').value.trim();
+  if(!co){toast('거래처명을 입력하세요');return}
+  if(amt<=0){toast('금액을 입력하세요');return}
+  const key=b2bKey(date,code);
+  const entries=(await rGet(key))||[];
+  entries.push({id:Date.now(),co,amt,memo,ts:new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})});
+  const ok=await rSet(key,entries);
+  if(ok===false){toast('저장 실패. 다시 시도해 주세요');return}
+  document.getElementById('newB2BCo').value='';
+  document.getElementById('newB2BAmt').value='';
+  document.getElementById('newB2BMemo').value='';
+  toast(`B2B ${won(amt)} 등록됐습니다 ✓`);
+  renderManageB2B();
+}
+
+
+</script>
+</body>
+</html>
